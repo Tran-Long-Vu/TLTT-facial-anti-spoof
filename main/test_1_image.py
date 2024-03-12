@@ -5,54 +5,90 @@ import onnx
 import os
 import PIL.Image as Image
 import torchvision.transforms as tf
+import cv2
 # FAS
 class LivenessDetection():
-    def __init__(self) -> None: # save data
+    def __init__(self) -> None: 
         pass
+    
     def configurations(self): # key info
         pass
-    @classmethod
-    def load_model(self, path_to_model):
+    
+    @classmethod # load model
+    def load_model(self,
+                   path_to_model):
         model = onnx.load(path_to_model)
         onnx.checker.check_model(model)
-        #print("loaded model")
-        #input_names = [input.name for input in model.graph.input]
-        #print("input name" + str(input_names))
         return model
-    @classmethod
-    def pre_processing(self,path_to_image):
+    
+    @classmethod # single image preprocess.
+    def pre_processing(self,
+                       path_to_image): 
         image = Image.open(path_to_image)
         image = image.resize((128, 128))
         image = np.expand_dims(image,0)
         image_array = np.array(image).astype(np.float32)
-        image_array = np.transpose(image_array, (0,3,1,2))
-        #image_array.transpose(2,0,1)
-        
-        #transform = tf.Compose([tf.PILToTensor()])
-        #tensor = transform(image)
-        
-        #print("converted image")
+        image_array = np.transpose(image_array, (0,3,1,2))        
         return image_array
-        pass
+    
+    def single_video_pre_processing(path_to_video):
+        cap = cv2.VideoCapture(path_to_video)
+        success, image = cap.read()
+        count = 0
+        while success:
+            cv2.imwrite("frame" % count, image)
+            success, image = cap.read()
+            count+=1
+        # images, to list of NP array
+        # return NP array
+        return 0
+            
+    @classmethod # video preprocess
     def post_processing(self):
         # input tensor
         # run check format
         pass
-    @classmethod
+    
+    @classmethod # run on single img
     def run_on_image(self,
                      path_to_model, 
                      path_to_image): # run
-        model = self.load_model(path_to_model)
+        #model = self.load_model(path_to_model)
         image = self.pre_processing(path_to_image)
-        # onnx runtime load model
         ort_sess = ort.InferenceSession(path_to_model)
         outputs = ort_sess.run(None, {'actual_input_1': image})
-        print("final output: " + str(outputs))# print result
+        print("Prediction output: " + str(outputs))# print image name / result
         return 0
-    def run_on_folder(self):
-        pass 
-    def run_on_video(self):
-        pass
+    
+    @classmethod # run on folder
+    def run_on_folder(self, 
+                      path_to_data,
+                      path_to_model):
+        images = os.listdir(path_to_data)
+        for image in images:
+            path_to_image = os.path.join(path_to_data + image)
+            self.run_on_image(path_to_model, path_to_image)
+        return 0 
+    
+    @classmethod # run on video
+    def run_on_video(self, 
+                     path_to_single_video, 
+                     path_to_model):
+        # read inference
+        # 
+        # cv2 read frames
+        # model inference (frame into dir)
+        # 
+        return 0
+    
+    def run_on_one_video(self,
+                         path_to_video_data,
+                         path_to_model):
+        # read list of images
+        # for image in list
+        # inference.
+        # return putput
+        return 0
 
 class FaceDetection():
     def __init__(self) -> None:
@@ -67,9 +103,16 @@ class FASSolutions():
 if __name__ == '__main__':
     # processor = ... CPU
     path_to_model = "./model/anti-spoof-mn3.onnx"
-    path_to_image = './data/10.jpg'
+    path_to_image = './data/real.jpg'
     path_to_video = ''
+    path_to_data = './data/images/all/'
+    
     obj_test = LivenessDetection() # init class
     #obj_test.load_model(path_to_model)        # run def
     #obj_test.pre_processing(path_to_image)
-    obj_test.run_on_image(path_to_model, path_to_image)
+    #obj_test.run_on_image(path_to_model, path_to_image)
+    obj_test.run_on_folder(path_to_data, path_to_model)
+    #obj_test.run_on_videos().
+
+
+
