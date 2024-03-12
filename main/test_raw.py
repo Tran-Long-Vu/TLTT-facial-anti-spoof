@@ -8,6 +8,16 @@ import torchvision.transforms as tf
 import cv2
 import time
 # FAS
+
+def delete_all_in_directory(directory):
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+        elif os.path.isdir(file_path):
+            delete_all_in_directory(file_path)
+            os.rmdir(file_path)
+
 class LivenessDetection():
     def __init__(self) -> None: 
         pass
@@ -97,14 +107,17 @@ class LivenessDetection():
         # model inference (frame into dir)
         return 0
     
-    # inference on video
-    def run_on_one_video(self,
+    # Inference on 1 video
+    def run_on_one_video(self, 
                          path_to_video,
                          path_to_write,
                          path_to_model
     ):
         # preprocess
-        self.single_video_pre_processing(path_to_video,path_to_write)
+        self.single_video_pre_processing(path_to_video,
+                                         path_to_write
+        )
+        # folder
         self.run_on_folder(path_to_write,
                            path_to_model
         )
@@ -112,15 +125,23 @@ class LivenessDetection():
         delete_all_in_directory(path_to_write)
         return 0
 
-
-def delete_all_in_directory(directory):
-    for filename in os.listdir(directory):
-        file_path = os.path.join(directory, filename)
-        if os.path.isfile(file_path):
-            os.remove(file_path)
-        elif os.path.isdir(file_path):
-            delete_all_in_directory(file_path)
-            os.rmdir(file_path)
+    # TODO: run all videos
+    def run_on_all_videos(self,
+                                path_to_video_dir,
+                                path_to_write,
+                                path_to_model,
+    ):
+        # loop through the folder
+        videos = os.listdir(path_to_video_dir)
+        for video in videos:
+            path_to_single_video = os.path.join(path_to_video_dir + video)
+            print(path_to_single_video)
+            self.run_on_one_video(
+                              path_to_single_video,
+                              path_to_write,
+                              path_to_model
+            )
+        return 0
 
 class FaceDetection():
     def __init__(self) -> None:
@@ -136,18 +157,14 @@ if __name__ == '__main__':
     # processor = ... CPU
     path_to_model = "./model/anti-spoof-mn3.onnx"
     path_to_image = './data/real.jpg'
-    path_to_video = './data/videos/fake_videos/20240312_021801.mp4'
+    path_to_single_video = './data/videos/fake_videos/20240312_021946.mp4'
     path_to_data = './data/images/all/'
     path_to_write = './data/videos/fake_video_frames/'
-    
+    path_to_video_dir = './data/videos/fake_videos/'
     # init obj
     obj_test = LivenessDetection() # init class
     # obj_test.run_on_image(path_to_model, path_to_image)
     # obj_test.run_on_folder(path_to_data, path_to_model)
     # obj_test.single_video_pre_processing(path_to_video, path_to_write)
-    obj_test.run_on_one_video(path_to_video,
-                              path_to_write, 
-                              path_to_model)
-    # TODO: run all videos in folder. 
-
-
+    #obj_test.run_on_one_video(path_to_single_video, path_to_write, path_to_model)
+    obj_test.run_on_all_videos(path_to_video_dir, path_to_write, path_to_model )
