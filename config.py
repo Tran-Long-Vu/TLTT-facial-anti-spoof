@@ -1,0 +1,2 @@
+#global
+CONFIGS_HERE = 'GLOBAL_VAR'

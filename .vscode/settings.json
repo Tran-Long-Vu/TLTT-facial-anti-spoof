@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
-        "imwrite"
+        "Albumentations",
+        "imwrite",
+        "onnxruntime",
+        "torchvision"
     ]
 }
