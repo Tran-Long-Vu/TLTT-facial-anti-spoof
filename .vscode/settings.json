@@ -3,6 +3,8 @@
         "Albumentations",
         "imwrite",
         "onnxruntime",
-        "torchvision"
+        "sess",
+        "torchvision",
+        "tqdm"
     ]
 }

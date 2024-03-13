@@ -19,10 +19,24 @@ class LivenessDetection():
     
     @classmethod # load model
     def load_model(self,
-                   path_to_model):
-        model = onnx.load(path_to_model)
-        onnx.checker.check_model(model)
-        return model
+                   path_to_model,
+                   model_format = ""):
+        
+        if model_format =='onnx':
+            import onnxruntime
+            onnx_model = onnxruntime.InferenceSession(path_to_model)
+            print( 'Loaded:' + str(onnx_model._model_path))
+            return onnx_model
+        if model_format == 'pth':
+            import torch
+            pth_model = torch.load(path_to_model)
+            pth_model.eval()
+            print( 'Loaded: pth')
+            return pth_model
+        else:
+            print("model error")
+            return 0
+        # TODO: if format == "jit"
     
     @classmethod # single image preprocess.
     def pre_processing(self,
@@ -74,10 +88,12 @@ class LivenessDetection():
     @classmethod # run on single img
     def run_on_image(self,
                      path_to_model, 
-                     path_to_image): # run
+                     path_to_image,
+                     model_format): # run
         #model = self.load_model(path_to_model)
         image = self.pre_processing(path_to_image)
-        ort_sess = ort.InferenceSession(path_to_model)
+        ort_sess =  self.load_model(path_to_model, model_format=model_format) #ort.InferenceSession(path_to_model)
+        
         outputs = ort_sess.run(None, {'actual_input_1': image})
         print("Prediction output: " + str(outputs))# print image name / result
         return 0
@@ -85,11 +101,12 @@ class LivenessDetection():
     @classmethod # run on folder
     def run_on_folder(self, 
                       path_to_data,
-                      path_to_model):
+                      path_to_model,
+                      model_format):
         images = os.listdir(path_to_data)
         for image in images:
             path_to_image = os.path.join(path_to_data + image)
-            self.run_on_image(path_to_model, path_to_image)
+            self.run_on_image(path_to_model, path_to_image, model_format=model_format)
         return 0 
     
     @classmethod # run on video. auto delete
@@ -103,7 +120,8 @@ class LivenessDetection():
     def run_on_one_video(self, 
                          path_to_video,
                          path_to_write,
-                         path_to_model
+                         path_to_model,
+                         model_format
     ):
         # preprocess
         self.single_video_pre_processing(path_to_video,
@@ -111,7 +129,8 @@ class LivenessDetection():
         )
         # folder
         self.run_on_folder(path_to_write,
-                           path_to_model
+                           path_to_model,
+                           model_format
         )
         # delete all
         delete_all_in_directory(path_to_write)
@@ -119,9 +138,10 @@ class LivenessDetection():
 
     # TODO: run all videos
     def run_on_all_videos(self,
-                                path_to_video_dir,
-                                path_to_write,
-                                path_to_model,
+                          path_to_video_dir,
+                          path_to_write,
+                          path_to_model,
+                          model_format
     ):
         # loop through the folder
         videos = os.listdir(path_to_video_dir)
@@ -131,7 +151,8 @@ class LivenessDetection():
             self.run_on_one_video(
                               path_to_single_video,
                               path_to_write,
-                              path_to_model
+                              path_to_model,
+                              model_format=model_format
             )
         return 0
 
@@ -154,11 +175,12 @@ if __name__ == '__main__':
     path_to_data = './data/all_images/'
     path_to_write = './data/videos/fake_video_frames/'
     path_to_video_dir = './data/videos/fake_videos/'
-    
+    model_format = "onnx"
     # Tests:
     obj_test = LivenessDetection() # init class
-    # obj_test.run_on_image(path_to_model, path_to_image)
-    obj_test.run_on_folder(path_to_data, path_to_model)
-    # obj_test.single_video_pre_processing(path_to_video, path_to_write)
-    # obj_test.run_on_one_video(path_to_single_video, path_to_write, path_to_model)
-    # obj_test.run_on_all_videos(path_to_video_dir, path_to_write, path_to_model )
+    # obj_test.load_model(path_to_model, model_format)
+    # obj_test.run_on_image(path_to_model, path_to_image, model_format)
+    # obj_test.run_on_folder(path_to_data, path_to_model, model_format)
+    # obj_test.single_video_pre_processing(path_to_video, path_to_write, model_format)
+    # obj_test.run_on_one_video(path_to_single_video, path_to_write, path_to_model, model_format)
+    obj_test.run_on_all_videos(path_to_video_dir, path_to_write, path_to_model, model_format)
