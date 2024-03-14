@@ -99,17 +99,17 @@ class TestEngine():
             digits = 4, 
         ))
         
-        #print("TP: " + str(true_positive))
-        #print("TN: " + str(true_negative))
-        #print("FP: " + str(false_positive))
-        #print("FN: " + str(false_negative))
+        #print("TP: " + str(true_positive))  
+        #print("TN: " + str(true_negative))  
+        #print("FP: " + str(false_positive)) 
+        #print("FN: " + str(false_negative)) 
         
-        FAR =  false_positive / (false_positive + true_negative) 
-        FRR = false_negative / (false_negative + true_positive)
+        far =  false_positive / (false_positive + true_negative)  * 100
+        frr = false_negative / (false_negative + true_positive) * 100
         
-        print("FAR: " + str(FAR))
-        print("FRR: " + str(FRR))
-        print("HTER: " + str((FAR + FRR)/2) )
+        print("FAR: " + "{:.2f}".format(far) +  "%")
+        print("FRR: " + "{:.2f}".format(frr) +  "%")
+        print("HTER: " +  "{:.2f}".format((far + frr)/2) +  "%" )
         
         print("\nFinish Testing ...\n" + " = "*16)
         return {
