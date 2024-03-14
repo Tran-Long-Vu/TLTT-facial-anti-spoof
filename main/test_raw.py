@@ -1,5 +1,7 @@
 from libs import *
-#import os
+import os
+from PIL import Image
+import numpy as np
 
 def delete_all_in_directory(directory):
     for filename in os.listdir(directory):
@@ -109,13 +111,7 @@ class LivenessDetection():
             self.run_on_image(path_to_model, path_to_image, model_format=model_format)
         return 0 
     
-    @classmethod # run on video. auto delete
-    def run_on_video_dir(self):
-        # read inference
-        # cv2 read frames
-        # model inference (frame into dir)
-        return 0
-    
+
     # Inference on 1 video
     def run_on_one_video(self, 
                          path_to_video,
@@ -179,8 +175,8 @@ if __name__ == '__main__':
     # Tests:
     obj_test = LivenessDetection() # init class
     # obj_test.load_model(path_to_model, model_format)
-    # obj_test.run_on_image(path_to_model, path_to_image, model_format)
+    obj_test.run_on_image(path_to_model, path_to_image, model_format)
     # obj_test.run_on_folder(path_to_data, path_to_model, model_format)
     # obj_test.single_video_pre_processing(path_to_video, path_to_write, model_format)
     # obj_test.run_on_one_video(path_to_single_video, path_to_write, path_to_model, model_format)
-    obj_test.run_on_all_videos(path_to_video_dir, path_to_write, path_to_model, model_format)
+    # obj_test.run_on_all_videos(path_to_video_dir, path_to_write, path_to_model, model_format)
