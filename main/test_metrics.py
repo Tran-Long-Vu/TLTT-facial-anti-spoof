@@ -11,22 +11,11 @@ from image_dataset import ImageDataset
 class LivenessDetection():
     def __init__(self) -> None: 
         pass
-    
-    def configurations(self): # key config saves
-        pass
-    
-    # return preprocessing albumentations input(tensor)
     def preprocess():
         pass
-    
-    # post process onnx output into metrics
     def postprocess():
         pass
-    
-    #load torch utils dataset 
-    # hard code test
-    def load_dataloader(self,path_to_data_dir,model_format): # loader
-        # init Dataset
+    def load_dataloader(self,path_to_data_dir,model_format):
         dataset = ImageDataset(path_to_data_dir,
                            image_size= 128,
                            model_format=model_format)
@@ -40,14 +29,11 @@ class LivenessDetection():
               " |  Batches: " + str(len(test_loader)))
         return test_loader
     
-    # load model
-    @classmethod # load model
     def load_model(self,
                    path_to_model,
                    model_format = "",
                    provider = ["CPUExecutionProvider"] # default
                    ):
-        
         if model_format =='onnx':
             import onnxruntime
             onnx_model = onnxruntime.InferenceSession(path_to_model, 
@@ -62,8 +48,6 @@ class LivenessDetection():
             return pth_model
         # TODO: if format == "jit"
     
-    # run inference with onnx model
-    @classmethod
     def run_test(self,
                  test_loader,
                  model,
@@ -83,8 +67,9 @@ class LivenessDetection():
                        device=device
         )
         return 0
+    
 if __name__ == '__main__':
-    # test paths
+    # Paths
     path_to_data_dir = "data/images/"
     path_to_onnx_model = "./model/anti-spoof-mn3.onnx"
     path_to_pth_model = ""
@@ -97,18 +82,11 @@ if __name__ == '__main__':
         provider = ["CUDAExecutionProvider"]
     else: 
         print("device issue")
-        
-    #path_to_image = './data/real.jpg'
-    #path_to_single_video = './data/videos/fake_videos/20240312_021946.mp4'
-    #path_to_data = './data/images/all/'
-    #path_to_write = './data/videos/fake_video_frames/'
-    #path_to_video_dir = './data/videos/fake_videos/'
-    
     
     # Tests:
-    obj_test = LivenessDetection() # init class
-    test_dataset = obj_test.load_dataloader(path_to_data_dir, model_format) # call dataset
+    obj_test = LivenessDetection() 
+    test_dataset = obj_test.load_dataloader(path_to_data_dir, model_format) 
     model = obj_test.load_model(path_to_onnx_model,
                                 model_format,
-                                provider ) # call self.load_model
-    obj_test.run_test(test_dataset,model, model_format = model_format, device = device) # call engine
+                                provider ) 
+    obj_test.run_test(test_dataset,model, model_format = model_format, device = device)

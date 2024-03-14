@@ -60,19 +60,36 @@ class TestEngine():
         running_labels, running_predictions = [] ,[]
         test_loss, test_accuracy = 0.0, 0.0
         
+        true_positive = 0
+        true_negative = 0
+        false_positive = 0
+        false_negative = 0
+        
         # loop
         for images, labels, in tqdm.tqdm(test_loader): # batches
             images, labels = images.to(device), labels.to(device)
             input_data = images.float().cpu().numpy() # change to np
             reshaped_input = input_data.reshape(-1,3,128,128)
-            # Perform inference using the ONNX model
+            # Perform inference using the ONNX model. Image by Image
             outputs = onnx_model.run(None, {'actual_input_1': reshaped_input})
-            logits = torch.from_numpy(outputs[0]).to(device)
-            loss = F.cross_entropy(logits, labels)
-
+            logits = torch.from_numpy(outputs[0]).to(device) # prediction
+            loss = F.cross_entropy(logits, labels) #loss
+            
             running_loss, running_corrects,  = running_loss + loss.item()*images.size(0), running_corrects + torch.sum(torch.max(logits, 1)[1] == labels.data).item(), 
             running_labels, running_predictions,  = running_labels + labels.data.cpu().numpy().tolist(), running_predictions + torch.max(logits, 1)[1].detach().cpu().numpy().tolist(), 
+            # count
+            if torch.max(logits, 1)[1] == 1 and labels.data == 1:
+                true_positive += 1
+            elif torch.max(logits, 1)[1] == 0 and labels.data == 0:
+                true_negative += 1
+            elif torch.max(logits, 1)[1] == 1 and labels.data == 0:
+                false_positive += 1
+            elif torch.max(logits, 1)[1] == 0 and labels.data == 1:
+                false_negative += 1
+        
         test_loss, test_accuracy,  = running_loss/len(test_loader.dataset), running_corrects/len(test_loader.dataset), 
+        
+        # output
         print("{:<8} - loss:{:.4f}, accuracy:{:.4f}".format(
             "test", 
             test_loss, test_accuracy, 
@@ -81,7 +98,19 @@ class TestEngine():
             running_labels, running_predictions, 
             digits = 4, 
         ))
-
+        
+        #print("TP: " + str(true_positive))
+        #print("TN: " + str(true_negative))
+        #print("FP: " + str(false_positive))
+        #print("FN: " + str(false_negative))
+        
+        FAR =  false_positive / (false_positive + true_negative) 
+        FRR = false_negative / (false_negative + true_positive)
+        
+        print("FAR: " + str(FAR))
+        print("FRR: " + str(FRR))
+        print("HTER: " + str((FAR + FRR)/2) )
+        
         print("\nFinish Testing ...\n" + " = "*16)
         return {
             "test_loss":test_loss, "test_accuracy":test_accuracy, 
