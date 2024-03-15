@@ -1,3 +1,4 @@
+# test with fd model
 import os, sys
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
@@ -71,8 +72,8 @@ class LivenessDetection():
 if __name__ == '__main__':
     # Paths
     path_to_data_dir = "data/images/"
-    path_to_onnx_model = "./model/anti-spoof-mn3.onnx"
-    path_to_pth_model = ""
+    path_to_fd_model = "./model/scrfd.onnx"
+    path_to_fas_model = "./model/fas.onnx"
     model_format = 'onnx'
     provider = ''
     device = torch.device("cpu") 
@@ -86,7 +87,7 @@ if __name__ == '__main__':
     # Tests: Re run raw.
     obj_test = LivenessDetection() 
     test_dataset = obj_test.load_dataloader(path_to_data_dir, model_format) 
-    model = obj_test.load_model(path_to_onnx_model,
+    model = obj_test.load_model(path_to_fd_model,
                                 model_format,
                                 provider ) 
     obj_test.run_test(test_dataset,model, model_format = model_format, device = device)

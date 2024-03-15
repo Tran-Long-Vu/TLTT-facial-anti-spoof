@@ -205,7 +205,12 @@ class SCRFD:
                 kpss_list.append(pos_kpss)
         return scores_list, bboxes_list, kpss_list
 
-    def detect(self, img, thresh=0.5, input_size = None, max_num=0, metric='default'):
+    def detect(self,
+               img,
+               thresh=0.5, 
+               input_size = None,
+               max_num=0, 
+               metric='default'):
         assert input_size is not None or self.input_size is not None
         input_size = self.input_size if input_size is None else input_size
             
@@ -384,7 +389,7 @@ if __name__ == '__main__':
     
     
     
-    
+    # path
     # img_paths = ['/HDD4T/trangnt/DATA_FER/sing_data/db_llq/hcm/Employees/anhhq11/avar.JPG']
     # for img_path in img_paths:
     #     img = cv2.imread(img_path)
