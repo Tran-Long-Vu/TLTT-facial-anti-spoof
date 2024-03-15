@@ -50,6 +50,7 @@ class FaceDetector():
         for index, img in enumerate(cropped_img_list):
             file_name = f"cropped_image{index}.jpg"
             print("wrote: " + file_name)
+            print(cropped_img.shape)
             cv2.imwrite(file_name, cropped_img)
         # save
         
