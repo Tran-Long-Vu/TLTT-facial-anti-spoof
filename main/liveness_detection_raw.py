@@ -14,7 +14,7 @@ def delete_all_in_directory(directory):
 
 class LivenessDetection():
     def __init__(self) -> None: 
-        pass
+        self.model = self.load_model()
     
     def configurations(self): # key info
         pass
@@ -74,7 +74,10 @@ class LivenessDetection():
             if not ret:
                 continue
             # Write the results back to output location.
-            cv2.imwrite(path_to_write + "/%#05d.jpg" % (count+1), frame)
+            # cv2.imwrite(path_to_write + "/%#05d.jpg" % (count+1), frame)
+            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            #todo: inference
+            self.run_on_image(image)
             count = count + 1
             # If there are no more frames left
             if (count > (video_length-1)):
@@ -159,7 +162,10 @@ class FaceDetection():
 
 class FASSolutions():
     def __init__(self) -> None:
-        pass
+        self.liveness_processor = LivenessDetection()
+        self.face_detector = FaceDetection()
+        
+    ...
     #...
 
 # Run

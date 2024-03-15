@@ -83,7 +83,7 @@ if __name__ == '__main__':
     else: 
         print("device issue")
     
-    # Tests:
+    # Tests: Re run raw.
     obj_test = LivenessDetection() 
     test_dataset = obj_test.load_dataloader(path_to_data_dir, model_format) 
     model = obj_test.load_model(path_to_onnx_model,
