@@ -29,8 +29,6 @@ class ImageDataset(torch.utils.data.Dataset):
         image_array = np.transpose(image_array, (0,3,1,2))        
         return image_array
     
-    
-    
     # fas transform
     def transform_fas(self,
                        path_to_image): 
