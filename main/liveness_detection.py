@@ -3,15 +3,6 @@ import os
 from PIL import Image
 import numpy as np
 
-def delete_all_in_directory(directory):
-    for filename in os.listdir(directory):
-        file_path = os.path.join(directory, filename)
-        if os.path.isfile(file_path):
-            os.remove(file_path)
-        elif os.path.isdir(file_path):
-            delete_all_in_directory(file_path)
-            os.rmdir(file_path)
-
 class LivenessDetection():
     def __init__(self) -> None: 
         self.path_to_fas_model = "./model/fas.onnx"
@@ -55,19 +46,25 @@ class LivenessDetection():
     def single_video_pre_processing(self):
         pass
     
-    def run_on_one_image(self): # run
-        #model = self.load_model(path_to_fas_model)
-        image = self.pre_processing()
-        ort_sess =  self.model 
-        outputs = ort_sess.run(None, {'actual_input_1': image})
-        print("Prediction output: " + str(outputs))# print image name / result
-        return 0
+    # def run_on_one_image(self): # run
+    #    #model = self.load_model(path_to_fas_model)
+    #    image = self.pre_processing()
+    #    ort_sess =  self.model 
+    #    outputs = ort_sess.run(None, {'actual_input_1': image})
+    #    print("Prediction output: " + str(outputs))# print image name / result
+    #    return 0
     
     def run_on_formatted_image(self, image):
         ort_sess = self.model
         outputs = ort_sess.run(None, {'actual_input_1': image})
-        #print("Prediction output: " + str(outputs))# print image name / result
+        print("Prediction output: " + str(outputs))# print image name / result
         return 0
+    
+    def run_one_img_dir(self, face):
+        ort_sess = self.model
+        outputs = ort_sess.run(None, {'actual_input_1': face})
+        print("Prediction output: " + str(outputs))
+        return outputs
     
     def run_on_folder(self,):
         images = os.listdir(self.path_to_data)
@@ -76,24 +73,12 @@ class LivenessDetection():
             self.run_on_image(self.path_to_fas_model, path_to_image, model_format=self.model_format)
         return 0 
     
-
     # Inference on 1 video
     def run_on_one_video(self,
     ):
         return 0
 
-class FaceDetection():
-    def __init__(self) -> None:
-        pass
-    #...
 
-class FASSolutions():
-    def __init__(self) -> None:
-        #self.liveness_processor = LivenessDetection()
-        #self.face_detector = FaceDetection()
-        
-        pass
-    #...
 
 # Run
 if __name__ == '__main__':
