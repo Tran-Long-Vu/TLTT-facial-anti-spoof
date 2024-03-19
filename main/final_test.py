@@ -3,6 +3,7 @@ from scrfd import SCRFD
 from face_detector import *
 from image_dataset import ImageDataset
 from liveness_detection import LivenessDetection
+
 class FasSolution():
     def __init__(self) -> None: 
         self.fas = LivenessDetection()
@@ -10,7 +11,7 @@ class FasSolution():
         self.path_to_fas_model = "./model/fas.onnx"
         
         self.path_to_image = './data/real.png'
-        self.label = "0"
+        # self.label = "0"
         
         self.path_to_single_video = './data/videos/fake_videos/20240312_021946.mp4'
         self.path_to_data = './data/all_images/'
@@ -19,7 +20,7 @@ class FasSolution():
         self.path_to_video_dir = './data/videos/fake_videos/'
         self.model_format = "onnx"
         self.dataset = self.load_dataset()
-        self.dataloader = ''
+        self.dataloader = ""
         self.provider = ""
         self.device = torch.device("cpu") 
         if self.device == torch.device("cpu"):
@@ -34,7 +35,6 @@ class FasSolution():
         pass
     def load_dataset(self):
         dataset = ImageDataset(self.path_to_labeled_data,
-                           image_size= 640,
                            model_format=self.model_format)
         return dataset
     
@@ -58,23 +58,70 @@ class FasSolution():
             print("Prediction output: " + str(outputs))
         return outputs 
     
-    def print_benchmark_output(self):
+    def benchmark():
+        
         pass
 
 
 
     def run_on_image_dataset(self):
-        for image, label in self.dataset:
-            # image format is nparray.
-            formatted_faces, label = self.fd.run_on_img_dir(image, label)      
-            for face in formatted_faces:
-                output = self.fas.run_one_img_dir(face)
-                print("prediction: "+  str(output) + "  label: " + str(label)) # benchmark.
-            #   face.append(predictions) 
-        #   fas.benchmark(output)
-        # return benchmark. 
-        pass
-    
+        running_loss, running_corrects = 0.0, 0.0
+        running_labels, running_predictions = [] ,[]
+        test_loss, test_accuracy = 0.0, 0.0
+        
+        true_positive = 0
+        true_negative = 0
+        false_positive = 0
+        false_negative = 0
+        
+        batch_logits = []
+        batch_labels = []
+        
+        
+        for image, label in tqdm.tqdm(self.dataset): # change to dataloader causes error.
+            image, label = image.to(self.device), label.to(self.device) 
+            
+            
+            # reformat
+            image = np.array(image)
+            image = np.resize(image, (640,640,3))
+            label = label.item()
+            # print("    image    " + str(image.shape))
+            # print("    label    " + str(label))
+            if image is not None: 
+                formatted_faces = self.fd.run_on_img_dir(image)
+                for face in formatted_faces: # run evaluation
+                    outputs = self.fas.run_one_img_dir(face)
+                    logits = torch.from_numpy(outputs[0]).to(self.device) # prediction
+                    
+                    batch_logits.append(logits)
+                    batch_labels.append(label)                    
+                    loss = F.cross_entropy(logits, label) #loss
+        # Check if any logits and labels were accumulated
+        if len(batch_logits) > 0 and len(batch_labels) > 0:
+            # Concatenate logits and labels within the batch
+            batch_logits = torch.cat(batch_logits)
+            batch_labels = torch.tensor(batch_labels)
+
+            # Calculate loss for the accumulated logits and labels
+            loss = F.cross_entropy(batch_logits, batch_labels)
+
+        running_loss, running_corrects,  = running_loss + loss.item()*image.size(0), running_corrects + torch.sum(torch.max(logits, 1)[1] == label.data).item(), 
+        running_labels, running_predictions,  = running_labels + image.data.cpu().numpy().tolist(), running_predictions + torch.max(logits, 1)[1].detach().cpu().numpy().tolist(), 
+        
+
+        test_loss, test_accuracy,  = running_loss/len(self.dataset), running_corrects/len(self.dataset), 
+        print("{:<8} - loss:{:.4f}, accuracy:{:.4f}".format(
+        "test", 
+        test_loss, test_accuracy, 
+    ))
+        
+        print("\nFinish Testing ...\n" + " = "*16)
+        return {
+            "test_loss":test_loss, "test_accuracy":test_accuracy, 
+        }
+
+
 
         
     def run_fas_one_video():

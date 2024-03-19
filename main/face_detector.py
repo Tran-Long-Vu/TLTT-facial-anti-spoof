@@ -34,23 +34,23 @@ class FaceDetector():
     def face_detect_one_image(self):
         # path to sample photo: nparray (1,3,x,y)
         img = cv2.imread(self.path_to_one_image)
-        print( "Original shape: " +  str(img.shape))
+        #print( "Original shape: " +  str(img.shape))
         if img is not None: # check path
             fd = self.model
-            bboxes, kpss = fd.detect(img, 0.5, input_size = [640,640])
-            print("Bounding box list of array: " + str(bboxes))
+            bboxes, kpss = fd.detect(img, 0.5)
+            #print("Bounding box list of array: " + str(bboxes))
             # print("Complete one image.")
             return img, bboxes # , kpss
         else:
             #next img
-            print("no image.")
+            # print("no image.")
             return 0
         
     def face_detect_image_dir(self,img): 
             if img is not None: # check path
-                fd = self.model
-                bboxes, kpss = fd.detect(img, 0.5, input_size = [640,640])
-                print("Bounding box list of array: " + str(bboxes))
+                fd = self.model # format error
+                bboxes, kpss = fd.detect(img, 0.5, input_size = (640,640)) # error cv2 
+                #print("Bounding box list of array: " + str(bboxes))
                 return img, bboxes # , kpss
             else:
                 #next img
@@ -67,7 +67,7 @@ class FaceDetector():
             y_min = int(bbox[1])
             y_max = int(bbox[3])
             cropped_img = img[y_min:y_max, x_min:x_max]
-            print("Cropped shape: " +  str(cropped_img.shape))
+            #print("Cropped shape: " +  str(cropped_img.shape))
             # multiple faces in one image.
             cropped_img_list.append(cropped_img)
         return cropped_img_list 
@@ -77,13 +77,13 @@ class FaceDetector():
         img, bboxes = self.face_detect_image_dir(img_dir)
         cropped_img_list = []
         for bbox in bboxes:   
-            print(str(bbox))         
+            # print(str(bbox))         
             x_min = int(bbox[0])
             x_max = int(bbox[2])
             y_min = int(bbox[1])
             y_max = int(bbox[3])
             cropped_img = img[y_min:y_max, x_min:x_max]
-            print("Cropped shape: " +  str(cropped_img.shape))
+            #print("Cropped shape: " +  str(cropped_img.shape))
             # multiple faces in one image.
             cropped_img_list.append(cropped_img)
         return cropped_img_list 
@@ -104,7 +104,7 @@ class FaceDetector():
             resized_face = np.expand_dims(resized_face,0)
             face_array = np.array(resized_face).astype(np.float32)
             face_array = np.transpose(face_array, (0,3,1,2))   
-            print("Shape before FAS: "  + str(face_array.shape))     
+            #print("Shape before FAS: "  + str(face_array.shape))     
             formatted_faces.append(face_array)
         return formatted_faces  # list of 128x128 arrays
     
@@ -117,16 +117,16 @@ class FaceDetector():
             resized_face = np.expand_dims(resized_face,0)
             face_array = np.array(resized_face).astype(np.float32)
             face_array = np.transpose(face_array, (0,3,1,2))   
-            print("Shape prepare    FAS: "  + str(face_array.shape))     
+            #print("Shape before    FAS: "  + str(face_array.shape))     
             formatted_faces.append(face_array)
         # list of 128x128 arrays in one pic
         return formatted_faces
     
     
-    def run_on_img_dir(self, img_dir, label):
+    def run_on_img_dir(self, img_dir,):
         formatted_faces = self.format_cropped_faces_dir(img_dir)
         # array of arrays, pass label
-        return formatted_faces, label
+        return formatted_faces#, label
     
     def face_detect_folder():
         pass

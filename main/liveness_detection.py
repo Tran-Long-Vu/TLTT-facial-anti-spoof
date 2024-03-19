@@ -57,13 +57,13 @@ class LivenessDetection():
     def run_on_formatted_image(self, image):
         ort_sess = self.model
         outputs = ort_sess.run(None, {'actual_input_1': image})
-        print("Prediction output: " + str(outputs))# print image name / result
+        #print("Prediction output: " + str(outputs))# print image name / result
         return 0
     
     def run_one_img_dir(self, face):
         ort_sess = self.model
         outputs = ort_sess.run(None, {'actual_input_1': face})
-        print("Prediction output: " + str(outputs))
+        #print("Prediction output: " + str(outputs))
         return outputs
     
     def run_on_folder(self,):
