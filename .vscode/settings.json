@@ -2,6 +2,7 @@
     "cSpell.words": [
         "Albumentations",
         "imwrite",
+        "logit",
         "onnxruntime",
         "SCRFD",
         "sess",

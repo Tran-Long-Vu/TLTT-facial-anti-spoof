@@ -75,6 +75,7 @@ class FasSolution():
         running_loss, running_corrects = 0.0, 0.0
         running_labels, running_predictions = [] ,[]
         test_loss, test_accuracy = 0.0, 0.0
+        
         true_positive = 0
         true_negative = 0
         false_positive = 0
@@ -82,12 +83,10 @@ class FasSolution():
         
         for image, label in tqdm.tqdm(self.dataset): # change to dataloader causes error.
             if len(self.dataset) is not None:
-                
-                # tensor
-                # image, label = image.to(self.device), label.to(self.device)
-                
-                # reformat
-                # cv2 format
+
+                # image = cv2.cvtColor(image.permute(1, 2, 0).numpy(),
+                #                            cv2.COLOR_RGB2BGR)
+                # image = np.array(image)
                 # image = image.transpose((1,2,0))
                 # image = cv2.resize(image, (640,640))
                 # image = np.transpose(image, (2,0,1))
@@ -100,25 +99,49 @@ class FasSolution():
                 # print("    label    " + str(label))
                 # input: (1,3,640,640)
                 formatted_faces = self.fd.run_on_img_dir(image)
-                
-                
                 # run evaluation
                 # print(str(formatted_faces)) # error: no data found
                 
                 # check null
-                if formatted_faces is None:
+                if formatted_faces is not None:
+                    outputs = self.fas.run_one_img_dir(formatted_faces) # format: [0.02825426, 0.9717458 ]], dtype=float32)]
+                    prediction = outputs[0][0]
+                    logit = round(prediction[0])
+                    # print(str(logits))
+                    # calculate here. 1 = fake = positive , 0 = negative
+                    # TP
+                    if logit == 1 and label == 1:
+                        true_positive += 1
+                    # TN
+                    if logit == 0 and label == 0:
+                        true_negative += 1
+                    # FP# 
+                    if logit == 1 and label == 0:
+                        false_positive += 1
+                    # FN
+                    if logit == 0 and label == 1:
+                        false_negative += 1
+                    
+                    # logits = max outputs[0]
+                    # if logi
+                    
+                else:
                     formatted_faces = []
                     continue 
-                    # raise ValueError("Invalid NumPy array.")
-                else:
-                    self.fas.run_one_img_dir(formatted_faces)
-                    
-                    
-            
+        
+        
             else:
                 print("no image loaded")
                 return 0
-            
+        accuracy = (true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative) 
+        far =  false_positive / (false_positive + true_negative)  * 100
+        frr = false_negative / (false_negative + true_positive) * 100
+        print("FAR: " + "{:.2f}".format(far) +  "%")
+        print("FRR: " + "{:.2f}".format(frr) +  "%")
+        print("HTER: " +  "{:.2f}".format((far + frr)/2) +  "%" )
+        print("  Accuracy:  " + "{:.2f}".format(accuracy) +  "%")
+        print("\nFinish Testing ...\n" + " = "*16)
+    pass
 
         
     def run_fas_one_video():

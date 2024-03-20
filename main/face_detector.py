@@ -34,7 +34,8 @@ class FaceDetector():
     def face_detect_image_dir(self,image): 
             if image is not None: # check path
                 fd = self.model
-                bboxes, kpss = fd.detect(image,0.5,(640,640) ) # error cv2 
+                # auto resize?
+                bboxes, kpss = fd.detect(image,0.5) # error cv2 
                 #print("Bounding box list of array: " + str(bboxes))
                 return bboxes # , kpss
             else:
@@ -65,7 +66,7 @@ class FaceDetector():
 
     def format_cropped_faces_dir(self, cropped_faces):
         # cropped_img_list = self.crop_one_face_dir(image)
-        
+        # TODO: array of faces found in one image.
         # formatted_faces = []
         if len(cropped_faces) != 0:
             face = cropped_faces[0]  # first face
@@ -81,7 +82,7 @@ class FaceDetector():
             # formatted_faces.append(face)
             return face
         else:
-            print( "FD found no face. " )
+            # print( "FD found no face. " )
             pass
 
     def run_on_img_dir(self, image,):
