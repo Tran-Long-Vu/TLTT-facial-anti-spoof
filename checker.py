@@ -5,7 +5,7 @@ import onnxruntime as ort
 import torchvision.transforms as tfs
 from torch.utils.data import Dataset, DataLoader
 if __name__ == '__main__':
-    
+    print("cuda: " + str(torch.cuda.is_available()))
     # test paths
     path_to_data_dir = 'data/images/'
     model_format = 'onnx' # TODO: Make global vars into config file. (next week)

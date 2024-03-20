@@ -31,15 +31,19 @@ class ImageDataset(torch.utils.data.Dataset):
     def __getitem__(self, index ):
         image_path = self.all_image_paths[index]
         # PIL
-        image = Image.open(image_path) 
+        # image = Image.open(image_path) 
+        # cv2
+        image = cv2.imread(image_path)
         label = self.get_label(image_path)
+        
         # np array
-        image = np.array(image) 
-        image = np.resize(image, (640,640,3))
+        # image = np.array(image) 
+        # image = np.resize(image, (640,640,3))
+        
         # to tensor
         t_image = self.transform_t(image)
         t_label = torch.tensor(label)
         
         # print(image.size(1))
         
-        return t_image, t_label
+        return image, label

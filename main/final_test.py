@@ -20,16 +20,23 @@ class FasSolution():
         self.path_to_video_dir = './data/videos/fake_videos/'
         self.model_format = "onnx"
         self.dataset = self.load_dataset()
-        self.dataloader = ""
+        self.dataloader = self.load_dataloader()
         self.provider = ""
-        self.device = torch.device("cpu") 
+        self.cuda = torch.cuda.is_available()
+        if self.cuda == True:
+            print("cuda ready")
+            self.device = torch.device("cuda") 
+        else:
+            print("cpu ready")
+            self.device = torch.device("cpu") 
+
         if self.device == torch.device("cpu"):
             self.provider = ["CPUExecutionProvider"]# handling onnx
         elif self.device == torch.device("cuda"):
             self.provider = ["CUDAExecutionProvider"]
         else: 
             print("device issue")
-    
+        
         # a
         # b
         pass
@@ -68,66 +75,54 @@ class FasSolution():
         running_loss, running_corrects = 0.0, 0.0
         running_labels, running_predictions = [] ,[]
         test_loss, test_accuracy = 0.0, 0.0
-        
         true_positive = 0
         true_negative = 0
         false_positive = 0
         false_negative = 0
         
-        batch_logits = []
-        batch_labels = []
-        
-        
         for image, label in tqdm.tqdm(self.dataset): # change to dataloader causes error.
-            image, label = image.to(self.device), label.to(self.device) 
-            
-            
-            # reformat
-            image = np.array(image)
-            image = np.resize(image, (640,640,3))
-            label = label.item()
-            # print("    image    " + str(image.shape))
-            # print("    label    " + str(label))
-            if image is not None: 
+            if len(self.dataset) is not None:
+                
+                # tensor
+                # image, label = image.to(self.device), label.to(self.device)
+                
+                # reformat
+                # cv2 format
+                # image = image.transpose((1,2,0))
+                # image = cv2.resize(image, (640,640))
+                # image = np.transpose(image, (2,0,1))
+                # image = np.resize(image, (640,640))
+                # label = label.item()
+                
+                # check
+                # print("    image    " + str(image.shape))
+                # print("    type    " + str(type(image)))
+                # print("    label    " + str(label))
+                # input: (1,3,640,640)
                 formatted_faces = self.fd.run_on_img_dir(image)
-                for face in formatted_faces: # run evaluation
-                    outputs = self.fas.run_one_img_dir(face)
-                    logits = torch.from_numpy(outputs[0]).to(self.device) # prediction
+                
+                
+                # run evaluation
+                # print(str(formatted_faces)) # error: no data found
+                
+                # check null
+                if formatted_faces is None:
+                    formatted_faces = []
+                    continue 
+                    # raise ValueError("Invalid NumPy array.")
+                else:
+                    self.fas.run_one_img_dir(formatted_faces)
                     
-                    batch_logits.append(logits)
-                    batch_labels.append(label)                    
-                    loss = F.cross_entropy(logits, label) #loss
-        # Check if any logits and labels were accumulated
-        if len(batch_logits) > 0 and len(batch_labels) > 0:
-            # Concatenate logits and labels within the batch
-            batch_logits = torch.cat(batch_logits)
-            batch_labels = torch.tensor(batch_labels)
-
-            # Calculate loss for the accumulated logits and labels
-            loss = F.cross_entropy(batch_logits, batch_labels)
-
-        running_loss, running_corrects,  = running_loss + loss.item()*image.size(0), running_corrects + torch.sum(torch.max(logits, 1)[1] == label.data).item(), 
-        running_labels, running_predictions,  = running_labels + image.data.cpu().numpy().tolist(), running_predictions + torch.max(logits, 1)[1].detach().cpu().numpy().tolist(), 
-        
-
-        test_loss, test_accuracy,  = running_loss/len(self.dataset), running_corrects/len(self.dataset), 
-        print("{:<8} - loss:{:.4f}, accuracy:{:.4f}".format(
-        "test", 
-        test_loss, test_accuracy, 
-    ))
-        
-        print("\nFinish Testing ...\n" + " = "*16)
-        return {
-            "test_loss":test_loss, "test_accuracy":test_accuracy, 
-        }
-
-
+                    
+            
+            else:
+                print("no image loaded")
+                return 0
+            
 
         
     def run_fas_one_video():
         pass
-    
-    
     def run_fas_video_dataset():
         pass
 

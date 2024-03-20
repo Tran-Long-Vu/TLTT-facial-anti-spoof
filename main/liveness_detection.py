@@ -61,10 +61,13 @@ class LivenessDetection():
         return 0
     
     def run_one_img_dir(self, face):
-        ort_sess = self.model
-        outputs = ort_sess.run(None, {'actual_input_1': face})
-        #print("Prediction output: " + str(outputs))
-        return outputs
+        if face is not None:
+            ort_sess = self.model
+            outputs = ort_sess.run(None, {'actual_input_1': face})
+            #print("Prediction output: " + str(outputs))
+            return outputs
+        else:
+            return []
     
     def run_on_folder(self,):
         images = os.listdir(self.path_to_data)
