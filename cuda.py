@@ -1,4 +1,4 @@
-from libs import *
+import torch
 # torch library is cpu only.
 
 

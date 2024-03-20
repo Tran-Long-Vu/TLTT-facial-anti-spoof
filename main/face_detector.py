@@ -15,15 +15,19 @@ class FaceDetector():
 
         self.path_to_write = './data/videos/fake_video_frames/'
         self.path_to_video_dir = './data/videos/fake_videos/'
+        self.model_name = "scrfd"
         self.model_format = "onnx"
         self.model = self.load_model()
         # self.dataset = self.load_dataset()
         pass
     def load_model(self):
-        scrfd = SCRFD(model_file=self.path_to_fd_model)
-        print("loaded: " + str(self.path_to_fd_model))
-        scrfd.prepare(-1)
-        return scrfd
+        if self.model_name == "scrfd":
+            scrfd = SCRFD(model_file=self.path_to_fd_model)
+            print("loaded: " + str(self.path_to_fd_model))
+            scrfd.prepare(-1)
+            return scrfd
+        else:
+            return 0
     
     def load_dataset(self):
         dataset = ImageDataset(self.path_to_labeled_data,
