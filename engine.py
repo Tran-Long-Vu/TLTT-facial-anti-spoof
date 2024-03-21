@@ -21,7 +21,7 @@ class TestEngine():
             running_labels, running_predictions,  = [], [], 
             for images, labels in tqdm.tqdm(test_loader):
                 images, labels = images.to(device), labels.to(device)
-                print("loader in device")
+                # print("loader in device")
                 
                 logits = model(images.float())
                 loss = F.cross_entropy(logits, labels)
@@ -56,6 +56,7 @@ class TestEngine():
         print("\nStart Testing ...\n" + " = "*16)
         # check model in device (done)
         onnx_model = model # inference session format
+        
         running_loss, running_corrects = 0.0, 0.0
         running_labels, running_predictions = [] ,[]
         test_loss, test_accuracy = 0.0, 0.0
@@ -69,7 +70,7 @@ class TestEngine():
         for images, labels, in tqdm.tqdm(test_loader): # batches
             images, labels = images.to(device), labels.to(device)
             input_data = images.float().cpu().numpy() # change to np
-            reshaped_input = input_data.reshape(-1,3,128,128)
+            reshaped_input = input_data.reshape(-1,3,128,128) # reshape np
             # Perform inference using the ONNX model. Image by Image
             outputs = onnx_model.run(None, {'actual_input_1': reshaped_input})
             logits = torch.from_numpy(outputs[0]).to(device) # prediction
@@ -107,7 +108,7 @@ class TestEngine():
         far =  false_positive / (false_positive + true_negative)  * 100
         frr = false_negative / (false_negative + true_positive) * 100
         
-        print("FAR: " + "{:.2f}".format(far) +  "%")
+        print("FAR: " + "{:.2f}".format(far) +  "%") 
         print("FRR: " + "{:.2f}".format(frr) +  "%")
         print("HTER: " +  "{:.2f}".format((far + frr)/2) +  "%" )
         

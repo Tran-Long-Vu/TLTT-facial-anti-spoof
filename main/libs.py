@@ -1,6 +1,5 @@
 import numpy as np
 import onnxruntime as ort
-import onnx as onnx
 import os
 import PIL.Image as Image
 import torchvision.transforms as tf
