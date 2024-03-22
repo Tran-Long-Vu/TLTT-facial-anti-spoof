@@ -40,7 +40,7 @@ class ImageDataset(torch.utils.data.Dataset):
         # image = np.array(image) 
         # image = np.resize(image, (640,640,3))
         
-        # to tensor
+        # TODO - image to tensor
         t_image = self.transform_t(image)
         t_label = torch.tensor(label)
         
