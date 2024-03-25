@@ -16,6 +16,8 @@ class FaceDetector():
         self.model = self.load_model()
         # self.dataset = self.load_dataset()
         pass
+    
+    # load onnxruntime
     def load_model(self):
         if self.model_name == "scrfd":
             scrfd = SCRFD(model_file=self.path_to_fd_model)
@@ -24,13 +26,8 @@ class FaceDetector():
             return scrfd
         else:
             return 0
-    
-    def load_dataset(self):
-        dataset = ImageDataset(self.path_to_labeled_data,
-                           image_size= 640,
-                           model_format=self.model_format)
-        return dataset
 
+    # detect single image
     def face_detect_image_dir(self,image): 
             if image is not None: 
                 fd = self.model
@@ -40,6 +37,7 @@ class FaceDetector():
                 print("no image.")
                 return 0
 
+    # crop out face by bounding box
     def crop_one_face_dir(self,image, bboxes):
         cropped_faces = []
         for bbox in bboxes:
@@ -51,7 +49,7 @@ class FaceDetector():
             cropped_faces.append(face)
         return cropped_faces
 
-
+    # format for FAS inference
     def format_cropped_images_dir(self, cropped_faces):
         # TODO: array of faces found in one image.
         if len(cropped_faces) != 0:
@@ -64,14 +62,14 @@ class FaceDetector():
             face = np.array(face).astype(np.float32)
             return face
         else:
-            # print( "                   FD found no face. " )
             pass
-    
+
+    # inference on single frame of video
     def run_and_record_frame_video(self, frame):
         bboxes = self.face_detect_image_dir(frame)
         if type(bboxes) is  int:
             pass
-        else:
+        elif len(bboxes) > 0:
             bbox = bboxes[0]
             x_min = int(bbox[0])
             x_max = int(bbox[2])
@@ -89,7 +87,8 @@ class FaceDetector():
                 face = np.resize(face, (1,3,256,256))
             face = np.array(face).astype(np.float32)
             return face, width, height
-            
+    
+    # inference on single image of dataset            
     def run_on_img_dir(self, image,):
         
         if image is not None:
@@ -104,12 +103,7 @@ class FaceDetector():
         else:
             print("no image")
             return []
-    def face_detect_folder():
-        pass
-    def face_detect_one_video():
-        pass
-    def face_detect_video_folder():
-        pass
+
 
 if __name__ == '__main__':
     fd = FaceDetector()

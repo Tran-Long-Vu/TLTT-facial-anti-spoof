@@ -10,17 +10,15 @@ import pandas as pd
 class FasSolution():
     def __init__(self) -> None:
         
-        self.fas_model_backbone = "rn18" # can select mnv3 or rn18
+        self.fas_model_backbone = "rn18" # change between 'rn18' and 'mnv3'
         
         self.path_to_data = './data/all_images/'
         self.path_to_labeled_data = './data/images/'
-        # self.path_to_video_dir = './data/mini_videos/' # mini test with 10 videos.
-        self.path_to_video_dir = './data/videos/' # uncommend to run all videos.
-        
+        self.path_to_video_dir = './data/videos/'
+        self.path_to_save_frames = "./data/frames/"
         self.model_format = "onnx"
         self.dataset = self.load_dataset()
         self.video_dataset = self.load_video_dataset()
-        # self.dataloader = self.load_dataloader()
         self.provider = ""
         self.cuda = torch.cuda.is_available()
 
@@ -52,15 +50,19 @@ class FasSolution():
         else:
             print ("incorrect model")
         pass
+    
+    # init image dataset format
     def load_dataset(self):
         dataset = ImageDataset(self.path_to_labeled_data,
                            model_format=self.model_format)
         return dataset
     
+    # init video dataset format
     def load_video_dataset(self):
         video_dataset = VideoDataset(self.path_to_video_dir)
         return video_dataset
     
+    # Dataloader
     def load_dataloader(self):
         dataset = self.load_dataset()
         print("dir:" + self.path_to_labeled_data)
@@ -73,6 +75,7 @@ class FasSolution():
               " |  Batches: " + str(len(loader)))
         return loader
 
+    # run printing attack dataset
     def run_on_image_dataset(self):
         print("Start Testing ...\n" + " = "*16  + "  with backbone: " +  str(self.fd.fas_model_backbone))
         inference_times = []
@@ -114,7 +117,7 @@ class FasSolution():
                                 predicted_labels.append(logit)
                         else:
                             continue
-                    elif self.fas_model_backbone == 'rn18': # different calculation method
+                    elif self.fas_model_backbone == 'rn18':
                         prediction = outputs[0] 
                         prediction_softmax = np.exp(prediction) / np.sum(np.exp(prediction))
                         # print("   softmax prediction array:    "   +    str(prediction_softmax))
@@ -153,15 +156,7 @@ class FasSolution():
                 print("no image loaded")
                 return 0
         average_time = sum(inference_times) / len(self.dataset)
-        
         print(metrics.classification_report(true_labels, predicted_labels, digits=4))
-        
-        #print("TP: " + "{}".format(TP))
-        #print("TN: " + "{}".format(TN))
-        #print("FP: " + "{}".format(FP))
-        #print("FN: " + "{}".format(FN))
-        
-        
         far =  FP / (FP + TN)  * 100
         frr = FN / (FN + TP) * 100
         print("FAR: " + "{:.2f}".format(far) +  "%")
@@ -172,17 +167,18 @@ class FasSolution():
         print("total inference time: " +  "{:.2f}".format(sum(inference_times)) + " seconds.")
     pass
 
+    # run single video by path
     def run_on_video_file(self, path_to_test_video):
         
-        # count
         video_frames = []
         widths = []
         heights = []
         score_0s = []
         score_1s = []
         final_preds = []
+        img_paths = []
+        ground_truths = []
         
-        # total
         total_time = 0
         frame_count = 0
         video = cv2.VideoCapture(path_to_test_video)
@@ -194,58 +190,78 @@ class FasSolution():
         
         while video.isOpened():
             frame_count += 1
-            # record frame count as index []
             print( "         frame  count :    " + str(frame_count))
-            video_frames.append(frame_count) #infinite loop here
+            video_frames.append(frame_count) 
             ret, frame = video.read()
             if not ret:
                     break
             if frame is not None:
-                face, width, height  = self.fd.run_and_record_frame_video(frame)
-                # record width, height
-                print( "         W & H :   "   +   str( width)   +   "  &  "   +  str(height))
-                widths.append(width) #
-                heights.append(height) #
-                
-                outputs = self.fas.run_one_img_dir(face)
-                if self.fas_model_backbone == 'mnv3':
-                    prediction = outputs[0][0]
-                    score_0 = prediction[0]
-                    score_1 = prediction[1]
-                    print('      score 0:      ' + str(score_0) ) 
-                    print('      score 1:      ' + str(score_1) )
+                result  = self.fd.run_and_record_frame_video(frame)
+                if result is not None:
+                    face, width, height = result
+                    print( "         W & H :   "   +   str( width)   +   "  &  "   +  str(height))
+                    widths.append(width) 
+                    heights.append(height) 
+                    outputs = self.fas.run_one_img_dir(face)
+                    if self.fas_model_backbone == 'mnv3':
+                        prediction = outputs[0][0]
+                        score_0 = prediction[0]
+                        score_1 = prediction[1]
+                        print('      score 0:      ' + str(score_0) ) 
+                        print('      score 1:      ' + str(score_1) )
+                        score_0s.append(score_0)
+                        score_1s.append(score_1)
+                        if score_0 > score_1:
+                            final_pred = 0
+                            final_preds.append(final_pred)
+                            print('         final predict:   ' +  str(final_pred) + "\n")
+                        elif score_0 <= score_1:
+                            final_pred = 1
+                            final_preds.append(final_pred)
+                            print('         final predict:      ' +  str(final_pred) + "\n")
+                    elif self.fas_model_backbone == 'rn18': 
+                        prediction = outputs[0]
+                        prediction_softmax = np.exp(prediction) / np.sum(np.exp(prediction))
+                        score_0 = prediction_softmax[0]
+                        score_1 = prediction_softmax[1]
+                        print('      score 0:      ' + str(score_0) ) 
+                        print('      score 1:      ' + str(score_1) )
+                        score_0s.append(score_0)
+                        score_1s.append(score_1)
+                        if score_0 > score_1:
+                            final_pred = 0
+                            final_preds.append(final_pred)
+                            print('        final predict:      ' +  str(final_pred)  + "\n")
+                        elif score_0 <= score_1:
+                            final_pred = 1
+                            final_preds.append(final_pred)
+                            print('        final predict:      ' +  str(final_pred) + "\n")
+                    image_name = f'image_{frame_count}.png'
+                    path_to_save_img = (self.path_to_save_frames + image_name)
+                    cv2.imwrite(path_to_save_img, face)
+                    img_paths.append(path_to_save_img)
+                    ground_truth = int(os.path.basename(os.path.dirname(path_to_test_video)))
+                    ground_truths.append(ground_truth)
+                else:
+                    width = 0
+                    height = 0
+                    score_0 = 0.0
+                    score_1 = 0.0
+                    final_pred = 2
+                    ground_truth = int(os.path.basename(os.path.dirname(path_to_test_video)))
+                    
+                    widths.append(width)
+                    heights.append(height)
                     score_0s.append(score_0)
-                    score_1s.append(score_1)
-                    if score_0 > score_1:
-                        final_pred = 0
-                        final_preds.append(final_pred)
-                        print('         final predict:   ' +  str(final_pred) + "\n")
-                    elif score_0 <= score_1:
-                        final_pred = 1
-                        final_preds.append(final_pred)
-                        print('         final predict:      ' +  str(final_pred) + "\n")
-                elif self.fas_model_backbone == 'rn18': 
-                    prediction = outputs[0]
-                    prediction_softmax = np.exp(prediction) / np.sum(np.exp(prediction))
-                    score_0 = prediction_softmax[0]
-                    score_1 = prediction_softmax[1]
-                    print('      score 0:      ' + str(score_0) ) 
-                    print('      score 1:      ' + str(score_1) )
-                    score_0s.append(score_0)
-                    score_1s.append(score_1)
-                    if score_0 > score_1:
-                        final_pred = 0
-                        final_preds.append(final_pred)
-                        print('        final predict:      ' +  str(final_pred)  + "\n")
-                    elif score_0 <= score_1:
-                        final_pred = 1
-                        final_preds.append(final_pred)
-                        print('        final predict:      ' +  str(final_pred) + "\n")
+                    score_1s.append(score_0)
+                    final_preds.append(final_pred)
+                    img_paths.append('')
+                    ground_truths.append(ground_truth)
+                    
         video.release()
         end_time = time.time()
         total_time = ((end_time - start_time))
         print("    total inference time for video: "  +  str( total_time ) + " seconds ")
-        # record: a,b,c,d,e = [] [] [] [] [] 
         print("     total number of frames " + str(video_frames[-1]))
         print(" average width : " + str( sum(widths) / len(widths) ))
         print(" average height : " + str( sum(heights) / len(heights)))
@@ -258,16 +274,16 @@ class FasSolution():
              'heights': heights,
              'score_0s': score_0s,
              'score_1s': score_1s,
-             'final_preds': final_preds
+             'final_preds': final_preds,
+             'img_paths': img_paths,
+             'ground_truths': ground_truths
          })
         print(df)
         filename = 'real_video_benchmark.csv'
-        if not os.path.exists(filename):
-            df.to_csv(filename, index=False)
-        else:
-            print(f"The file '{filename}' already exists.")
-            return 0
+        df.to_csv(filename, index=False)
         pass
+   
+    # run on replay attack
     def run_on_video_dataset(self):
         print("Start Testing ...\n" + " = "*16  + "  with backbone: " +  str(self.fas_model_backbone))
         inference_times = []
@@ -277,7 +293,6 @@ class FasSolution():
         video_FN = 0.01
         predicted_labels = []
         true_labels = []
-        # count = 0
         for frame_array, label in tqdm.tqdm(self.video_dataset):
             if self.video_dataset is not None: 
                 start_time = time.time()
@@ -310,8 +325,6 @@ class FasSolution():
                             elif self.fas_model_backbone == 'rn18': 
                                 prediction = outputs[0] 
                                 prediction_softmax = np.exp(prediction) / np.sum(np.exp(prediction))
-                                # print("   softmax prediction array:    "   +    str(prediction_softmax))
-                                
                                 if prediction_softmax is not None:
                                     if label == 0:
                                         logit = round(prediction_softmax[0])
@@ -360,9 +373,6 @@ class FasSolution():
             end_time = time.time()
             inference_time = end_time - start_time
             inference_times.append(inference_time)
-            # count += 1
-            # if count  == 3:
-            #     break
             
         average_time = sum(inference_times) /  len(self.video_dataset)
         far =  video_FP / (video_FP + video_TN)  * 100
@@ -376,9 +386,12 @@ class FasSolution():
         print("total inference time all video: " +  "{:.2f}".format(sum(inference_times) / 60) + " minutes.")
         print("\nFinish Testing ...\n" + " = "*16)
         pass
+    
+# Uncomment to test other attacks.
 if __name__ == '__main__':
     fas_solution = FasSolution()
     # fas_solution.run_on_image_dataset()
     # fas_solution.run_on_video_dataset()
-    fas_solution.run_on_video_file("D:/Viettel_HT/FAS_Project_3_24/VHT-facial-anti-spoof/data/live_video_01.mp4")
+    # Change source path to run single video.
+    fas_solution.run_on_video_file("./data/video_benchmark/0/real.mp4")
     pass
