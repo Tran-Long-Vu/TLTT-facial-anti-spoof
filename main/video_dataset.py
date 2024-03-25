@@ -47,8 +47,6 @@ class VideoDataset(torch.utils.data.Dataset):
             # print("type: " + str(type(frame)))
             # print("frame count: " + str(count))
             if not ret:
-                
-                
                 break
             
         video.release()

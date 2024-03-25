@@ -66,13 +66,35 @@ class FaceDetector():
         else:
             # print( "                   FD found no face. " )
             pass
-
+    
+    def run_and_record_frame_video(self, frame):
+        bboxes = self.face_detect_image_dir(frame)
+        if type(bboxes) is  int:
+            pass
+        else:
+            bbox = bboxes[0]
+            x_min = int(bbox[0])
+            x_max = int(bbox[2])
+            y_min = int(bbox[1])
+            y_max = int(bbox[3])
+            
+            width = x_max - x_min
+            height = y_max - y_min
+            
+            face = frame[y_min:y_max, x_min:x_max]
+            face = np.expand_dims(face,0)
+            if self.fas_model_backbone == "mnv3":
+                face = np.resize(face, (1,3,128,128))
+            elif self.fas_model_backbone == "rn18":
+                face = np.resize(face, (1,3,256,256))
+            face = np.array(face).astype(np.float32)
+            return face, width, height
+            
     def run_on_img_dir(self, image,):
         
         if image is not None:
-            
             bboxes = self.face_detect_image_dir(image)
-            if len(bboxes) is not None: ## and passed backbone is mnv3
+            if len(bboxes) is not None:
                 face = self.crop_one_face_dir(image, bboxes)
                 formatted_face = self.format_cropped_images_dir(face)
                 return formatted_face
@@ -89,6 +111,5 @@ class FaceDetector():
     def face_detect_video_folder():
         pass
 
-if __name__ == '__main__':    
+if __name__ == '__main__':
     fd = FaceDetector()
-    

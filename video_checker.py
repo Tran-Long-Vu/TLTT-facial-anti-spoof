@@ -4,31 +4,30 @@ from main.video_dataset import VideoDataset
 import onnxruntime as ort
 import torchvision.transforms as tfs
 from torch.utils.data import Dataset, DataLoader
+from main.face_detector import FaceDetector
+from main.liveness_detection import LivenessDetection
+
 
 if __name__ == '__main__':
     print("cuda: " + str(torch.cuda.is_available()))
     # test paths
-    
-    path_to_video_dir = 'data/videos/'
-    
-    model_format = 'onnx' 
-    
-    dataset = VideoDataset(path_to_video_dir)
-    
-    print("dir:" + path_to_video_dir)
-
-    test_loader = torch.utils.data.DataLoader(
-        dataset,
-        batch_size = 1, 
-    )
-    
-    print("loaded torch.dataloader " +
-          " | model format:  " + str(model_format) + 
-          " |  Batches: " + str(len(test_loader)))
-    
+    path_to_single_video = 'data/videos/'
     print("checker video    |    loading a single video: ")
-    frame_array = dataset[3]
-    print(frame_array)
-    # print(frame_array.shape)
-    # print(type(frame_array))
-    # print(frame_array)
+    
+    fd = FaceDetector()
+    fas = LivenessDetection()
+    # for every frame in frames:
+        # run face detector(frame)
+        # process bboxes. record frame bboxes
+        # run fas. record
+    
+    
+        # return width height of the bounding box
+        # return confidence score of facial spoofing ()
+        # reture
+        
+        # test output:
+        # frame --- width --- height --- confidence score that its a spoof.
+        # 1 ---- 444 ---- 555 ----- 0.9(fake one).
+        # 2 ---- 444 ---- 555 ----- 0.9(fake one).
+        # average: 435 --- 535 ---- 0.8

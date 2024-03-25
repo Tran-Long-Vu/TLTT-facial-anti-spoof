@@ -42,6 +42,7 @@ class LivenessDetection():
             print("   FAS   cannot read face")
             return []
     
+    # run on an array of videos
 
 
 
