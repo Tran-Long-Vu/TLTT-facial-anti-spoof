@@ -2,6 +2,7 @@ from libs import *
 import os
 from PIL import Image
 import numpy as np
+from config import *
 
 class LivenessDetection():
     def __init__(self,path_to_fas_model) -> None: 
