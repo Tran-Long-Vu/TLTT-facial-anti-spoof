@@ -1,9 +1,9 @@
 from libs import *
-from scrfd import SCRFD
-from face_detector import *
-from image_dataset import ImageDataset
-from liveness_detection import LivenessDetection
-from video_dataset import VideoDataset
+from engines.scrfd import * 
+from engines.face_detector import *
+from data_script.image_dataset import ImageDataset
+from engines.liveness_detection import LivenessDetection
+from data_script.video_dataset import VideoDataset
 import sklearn.metrics as metrics
 import pandas as pd
 
@@ -12,10 +12,10 @@ class FasSolution():
         
         self.fas_model_backbone = "rn18" # change between 'rn18' and 'mnv3'
         
-        self.path_to_data = './data/all_images/'
-        self.path_to_labeled_data = './data/images/'
-        self.path_to_video_dir = './data/videos/'
-        self.path_to_save_frames = "./data/frames/"
+        self.path_to_data = './data/crawl_test/all_images/'
+        self.path_to_labeled_data = './data/crawl_test/images/'
+        self.path_to_video_dir = './data/crawl_test/videos/'
+        self.path_to_save_frames = "./data/crawl_test/frames/"
         self.model_format = "onnx"
         self.dataset = self.load_dataset()
         self.video_dataset = self.load_video_dataset()
@@ -390,8 +390,8 @@ class FasSolution():
 # Uncomment to test other attacks.
 if __name__ == '__main__':
     fas_solution = FasSolution()
-    # fas_solution.run_on_image_dataset()
+    fas_solution.run_on_image_dataset()
     # fas_solution.run_on_video_dataset()
     # Change source path to run single video.
-    fas_solution.run_on_video_file("./data/video_benchmark/0/real.mp4")
+    # fas_solution.run_on_video_file("./data/video_benchmark/0/real.mp4")
     pass

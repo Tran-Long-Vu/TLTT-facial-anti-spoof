@@ -1,13 +1,13 @@
 from libs import *
-from scrfd import SCRFD
-from image_dataset import ImageDataset
-from liveness_detection import LivenessDetection
+from engines.scrfd import SCRFD
+from data_script.image_dataset import ImageDataset
+from engines.liveness_detection import LivenessDetection
 
 class FaceDetector():
     def __init__(self) -> None:
         # self.data = self.load_data()
         self.path_to_fd_model = "./model/scrfd.onnx"
-        self.path_to_labeled_data = './data/images/'
+        self.path_to_labeled_data = './data/crawl_test/images/'
         
         self.fas_model_backbone = ""
         
@@ -31,7 +31,7 @@ class FaceDetector():
     def face_detect_image_dir(self,image): 
             if image is not None: 
                 fd = self.model
-                bboxes, kpss = fd.detect(image,0.3)
+                bboxes, kpss = fd.detect(image,0.5)
                 return bboxes 
             else:
                 print("no image.")

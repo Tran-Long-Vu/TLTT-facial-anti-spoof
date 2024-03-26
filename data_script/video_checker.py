@@ -1,11 +1,11 @@
 # data format checker
 from libs import *
-from main.video_dataset import VideoDataset
+from data_script.video_dataset import VideoDataset
 import onnxruntime as ort
 import torchvision.transforms as tfs
 from torch.utils.data import Dataset, DataLoader
-from main.face_detector import FaceDetector
-from main.liveness_detection import LivenessDetection
+from engines.face_detector import FaceDetector
+from engines.liveness_detection import LivenessDetection
 
 
 if __name__ == '__main__':
