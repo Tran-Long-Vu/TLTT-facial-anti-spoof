@@ -5,7 +5,6 @@ from data_script.image_dataset import ImageDataset
 from config import *
 import sklearn.metrics as metrics
 import pandas as pd
-import onnx
 # todo - configs file
 # mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 class FasTrainer():
@@ -300,7 +299,7 @@ class FasTrainer():
         plt.ylabel('HTER')
         plt.title('Train HTER over Epochs')
         plt.legend()
-        plt.savefig("./plots/accuracy_plot.png")
+        plt.savefig("./plots/train_HTER.png")
         plt.close()
         
         # Plot HTER over epoch
@@ -310,7 +309,7 @@ class FasTrainer():
         plt.ylabel('HTER')
         plt.title('Val HTER over Epochs')
         plt.legend()
-        plt.savefig("./plots/accuracy_plot.png")
+        plt.savefig("./plots/val_HTER.png")
         plt.close()
         
         
