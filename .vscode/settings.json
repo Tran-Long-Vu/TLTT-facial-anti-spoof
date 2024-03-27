@@ -1,10 +1,12 @@
 {
     "cSpell.words": [
         "Albumentations",
+        "DGFAS",
         "HTER",
         "imwrite",
         "logit",
         "onnxruntime",
+        "optim",
         "SCRFD",
         "sess",
         "softmax",

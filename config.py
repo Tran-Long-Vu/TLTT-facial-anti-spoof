@@ -1,11 +1,11 @@
-BATCH_SIZE = 32
+BATCH_SIZE = 8
 LOSS = ""
 LEARNING_RATE = 0.001
-NO_EPOCHS = 50
+NO_EPOCHS = 10
 DROPOUT = False
-OPTIMIZER = "adam"
-MODEL_FORMAT = ""
-MODEL_NAME = 'rn18'
+# OPTIMIZER = "adam"
+MODEL_BACKBONE= "rn18"
+MODEL_NAME = 'rn18fas'
 ATTACK_TYPE = 'printing'
 
 INFERENCE_DEVICE = 'CUDA'
@@ -17,8 +17,10 @@ TEST_DATASET = 'HAND_CRAWL'
 PATH_TO_IMAGES = ''
 PATH_TO_VIDEOS = ''
 PATH_TO_SINGLE_VIDEO = ''
-PATH_TO_DATASET = '/data/datasets/CVPR23/train/'
-
-
-
-
+PATH_TO_TRAIN_DATASET = 'data/datasets/CVPR23/train/'
+PATH_TO_TEST_DATASET = 'data\datasets\crawl_test\images/'
+PATH_TO_FAS_MODEL = ''
+PATH_TO_FD_MODEL =''
+PATH_TO_STATE_DICT = 'model/rn18-fas-ckp.pth'
+PATH_TO_ONNX_FAS = 'model/rn18-fas.onnx'
+PATH_TO_SAVE_CHECKPOINT = 'checkpoints'

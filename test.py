@@ -1,7 +1,8 @@
+from data_script.config import *
 from libs import *
 from engines.scrfd import * 
 from engines.face_detector import *
-from data_script.image_cvpr23_dataset import ImageDataset
+from data_script.image_dataset import ImageDataset
 from engines.liveness_detection import LivenessDetection
 from data_script.video_dataset import VideoDataset
 import sklearn.metrics as metrics
@@ -53,8 +54,11 @@ class FasSolution():
     
     # init image dataset format
     def load_dataset(self):
-        dataset = ImageDataset(self.path_to_labeled_data,
-                           model_format=self.model_format)
+        dataset = ImageDataset( TEST_DATASET,
+                                PATH_TO_TEST_DATASET,
+                                MODEL_BACKBONE,
+                                augment = 'test',
+                                    )
         return dataset
     
     # init video dataset format

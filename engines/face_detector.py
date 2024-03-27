@@ -1,6 +1,6 @@
 from libs import *
 from engines.scrfd import SCRFD
-from data_script.image_cvpr23_dataset import ImageDataset
+from data_script.image_dataset import ImageDataset
 from engines.liveness_detection import LivenessDetection
 from config import *
 class FaceDetector():

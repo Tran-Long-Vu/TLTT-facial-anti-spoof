@@ -1,0 +1,38 @@
+INFO:root:train_TP: 48
+INFO:root:train_TN: 5
+INFO:root:train_FP: 11
+INFO:root:train_FN: 21
+INFO:root:train_FAR: 0.6875
+INFO:root:train_FRR: 0.30434782608695654
+INFO:root:train_HTER: 0.49592391304347827
+
+
+
+INFO:root:val_TP: 76
+INFO:root:val_TN: 0
+INFO:root:val_FP: 16
+INFO:root:val_FN: 0
+INFO:root:val_FAR: 1.0
+INFO:root:val_FRR: 0.0
+INFO:root:val_HTER: 0.5
+INFO:root:train_TP: 76
+INFO:root:train_TN: 0
+INFO:root:train_FP: 16
+INFO:root:train_FN: 0
+INFO:root:train_FAR: 1.0
+INFO:root:train_FRR: 0.0
+INFO:root:train_HTER: 0.5
+INFO:root:val_TP: 76
+INFO:root:val_TN: 0
+INFO:root:val_FP: 16
+INFO:root:val_FN: 0
+INFO:root:val_FAR: 1.0
+INFO:root:val_FRR: 0.0
+INFO:root:val_HTER: 0.5
+INFO:root:train_TP: 76
+INFO:root:train_TN: 0
+INFO:root:train_FP: 16
+INFO:root:train_FN: 0
+INFO:root:train_FAR: 1.0
+INFO:root:train_FRR: 0.0
+INFO:root:train_HTER: 0.5
