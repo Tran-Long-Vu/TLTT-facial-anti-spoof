@@ -7,7 +7,7 @@ import sklearn.metrics as metrics
 import pandas as pd
 import onnx
 # todo - configs file
-
+# mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 class FasTrainer():
     def __init__(self) -> None:
         self.model_backbone = "rn18" # change between 'rn18' and 'mnv3'
@@ -68,22 +68,48 @@ class FasTrainer():
                               device,
                               save_ckp_dir        
         ):
+        # mlflow.set_experiment("FAS anti spoofing")
         print("\nStart Training ...\n" + " = "*16)
+        # delete all contents in log.
         model = model.to(device)
         print( "    Device:    "+ str(device))
         best_accuracy = 0.0
         # Configure logger
         logging.basicConfig(filename='./training_logs/training.log', level=logging.INFO)
+        # with mlflow.start_run():
+        params = {"epochs": 5, 
+                    "optimizer": "adam",
+                    "device": "cuda",
+                    "checkpoint": "first",
+                    }
+        # mlflow.log_params(params)
+        #plot
+        epoches =[]
+        train_accuracies=[]
+        train_losses=[]
+        train_fars=[]
+        train_frrs=[]
+        train_hters=[]
+        
+
+        val_accuracies=[]
+        val_losses=[]
+        val_fars=[]
+        val_frrs=[]
+        val_hters=[]
         for epoch in range(1, num_epochs + 1):
-            train_TP = 0
-            train_TN = 0
-            train_FP = 0
-            train_FN = 0
+            train_TP = 0.01
+            train_TN = 0.01
+            train_FP = 0.01
+            train_FN = 0.01
             
-            val_TP = 0
-            val_TN = 0
-            val_FP = 0
-            val_FN = 0
+            val_TP = 0.01
+            val_TN = 0.01
+            val_FP = 0.01
+            val_FN = 0.01
+            
+            epoches.append(epoch)
+            
             print("epoch {}/{}".format(epoch, num_epochs) + "\n" + " - "*16)
 
             model.train()
@@ -106,10 +132,17 @@ class FasTrainer():
 
                 running_loss, running_corrects,  = running_loss + loss.item()*images.size(0), running_corrects + torch.sum(torch.max(logits, 1)[1] == labels.data).item(), 
             train_loss, train_accuracy,  = running_loss/len(train_loader.dataset), running_corrects/len(train_loader.dataset), 
+            
+            # mlflow.log_metric("train_accuracy", train_accuracy)
+            # mlflow.log_metric("train_loss", train_loss)
+            
             train_FAR = train_FP / (train_FP + train_TN)
             train_FRR = train_FN / (train_FN + train_TP)
             train_HTER = (train_FAR + train_FRR) / 2
-            # wandb.log({"train_loss":train_loss, "train_accuracy":train_accuracy, }, step = epoch)
+            
+            # mlflow.log_metric("train_FAR", train_FAR)
+            # mlflow.log_metric("train_FRR", train_FRR)
+            # mlflow.log_metric("train_HTER", train_HTER)
             
             print("{:<8} - loss:{:.4f}, accuracy:{:.4f}".format(
                 "train", 
@@ -128,6 +161,14 @@ class FasTrainer():
             logging.info("train_FAR: {}".format(train_FAR))
             logging.info("train_FRR: {}".format(train_FRR))
             logging.info("train_HTER: {}".format(train_HTER))
+            logging.info("--------------")
+            
+            train_accuracies.append(train_accuracy)
+            train_losses.append(train_loss)
+            train_fars.append(train_FAR)
+            train_frrs.append(train_FRR)
+            train_hters.append(train_HTER)
+
             
             with torch.no_grad():
                 model.eval()
@@ -147,9 +188,20 @@ class FasTrainer():
                     running_loss, running_corrects,  = running_loss + loss.item()*images.size(0), running_corrects + torch.sum(torch.max(logits, 1)[1] == labels.data).item(), 
             val_loss, val_accuracy,  = running_loss/len(train_loader.dataset), running_corrects/len(train_loader.dataset), 
             # wandb.log({"val_loss":val_loss, "val_accuracy":val_accuracy, }, step = epoch)
+            
+            # mlflow.log_metric("val_accuracy", val_accuracy)
+            # mlflow.log_metric("val_loss", val_loss)
+
             val_FAR = val_FP / (val_FP + val_TN)
             val_FRR = val_FN / (val_FN + val_TP)
             val_HTER = (val_FAR + val_FRR) / 2
+            
+            # mlflow.log_metric("val_FAR", val_FAR)
+            # mlflow.log_metric("val_FRR", val_FRR)
+            # mlflow.log_metric("val_HTER", val_HTER)
+            
+
+            
             print("{:<8} - loss:{:.4f}, accuracy:{:.4f}".format(
                 "val", 
                 val_loss, val_accuracy, 
@@ -163,16 +215,110 @@ class FasTrainer():
             logging.info("val_FAR: {}".format(val_FAR))
             logging.info("val_FRR: {}".format(val_FRR))
             logging.info("val_HTER: {}".format(val_HTER))
+            logging.info("--------------")
+            
+            val_accuracies.append(val_accuracy)
+            val_losses.append(val_loss)
+            val_fars.append(val_FAR)
+            val_frrs.append(val_FRR)
+            val_hters.append(val_HTER)
+            
             if val_accuracy > best_accuracy:
                 torch.save(model, "{}/fas-best.ptl".format(save_ckp_dir))
                 best_accuracy = val_accuracy
         
         print("\nFinish Training ...\n" + " = "*16)
+        
+
+                
+        # Plot accuracy over epoch
+        plt.figure(figsize=(8, 6))
+        plt.plot(epoches, train_accuracies, label='Accuracy')
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy')
+        plt.title('Train Accuracy over Epochs')
+        plt.legend()
+        plt.savefig("./plots/train_accuracy_plot.png")
+        plt.close()
+
+        # Plot accuracy over epoch
+        plt.figure(figsize=(8, 6))
+        plt.plot(epoches, val_accuracies, label='Accuracy')
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy')
+        plt.title('Val Accuracy over Epochs')
+        plt.legend()
+        plt.savefig("./plots/val_accuracy_plot.png")
+        plt.close()
+        
+        # Plot accuracy over epoch
+        plt.figure(figsize=(8, 6))
+        plt.plot(epoches, val_losses, label='Loss')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.title('Train Loss over Epochs')
+        plt.legend()
+        plt.savefig("./plots/train_loss_plot.png")
+        plt.close()
+
+        # Plot accuracy over epoch
+        plt.figure(figsize=(8, 6))
+        plt.plot(epoches, val_losses, label='Loss')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.title('Val Loss over Epochs')
+        plt.legend()
+        plt.savefig("./plots/val_loss.png")
+        plt.close()
+        
+        # Plot FAR and FRR over epoch and save
+        plt.figure(figsize=(8, 6))
+        plt.plot(epoches, train_fars, label='FAR')
+        plt.plot(epoches, train_frrs, label='FRR')
+        plt.xlabel('Epoch')
+        plt.ylabel('Rate')
+        plt.title('Train FAR and FRR over Epochs')
+        plt.legend()
+        plt.savefig("./plots/train_far_frr_plot.png")
+        plt.close()
+        
+                # Plot FAR and FRR over epoch and save
+        plt.figure(figsize=(8, 6))
+        plt.plot(epoches, val_fars, label='FAR')
+        plt.plot(epoches, val_frrs, label='FRR')
+        plt.xlabel('Epoch')
+        plt.ylabel('Rate')
+        plt.title('VAL FAR and FRR over Epochs')
+        plt.legend()
+        plt.savefig("./plots/val_far_frr_plot.png")
+        plt.close()
+        
+        # Plot HTER over epoch
+        plt.figure(figsize=(8, 6))
+        plt.plot(epoches, train_hters, label='HTER')
+        plt.xlabel('Epoch')
+        plt.ylabel('HTER')
+        plt.title('Train HTER over Epochs')
+        plt.legend()
+        plt.savefig("./plots/accuracy_plot.png")
+        plt.close()
+        
+        # Plot HTER over epoch
+        plt.figure(figsize=(8, 6))
+        plt.plot(epoches, val_hters, label='HTER')
+        plt.xlabel('Epoch')
+        plt.ylabel('HTER')
+        plt.title('Val HTER over Epochs')
+        plt.legend()
+        plt.savefig("./plots/accuracy_plot.png")
+        plt.close()
+        
+        
         return {
             "train_loss":train_loss, "train_accuracy":train_accuracy, 
             "val_loss":val_loss, "val_accuracy":val_accuracy, 
         }
-        
+
     def train_replay_attack(self):
         
         pass
