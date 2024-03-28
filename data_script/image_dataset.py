@@ -1,5 +1,5 @@
 import __main__
-from config import *
+from configs.config import *
 # import
 from libs import *
 

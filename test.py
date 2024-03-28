@@ -1,4 +1,4 @@
-from data_script.config import *
+from configs.config import *
 from libs import *
 
 from data_script.video_dataset import VideoDataset
@@ -42,13 +42,13 @@ class FasSolution():
             print("device issue")
 
         if self.fas_model_backbone == "mnv3":
-            self.fas = LivenessDetection("./model/mnv3-fas.onnx")
+            self.fas = LivenessDetection()
             self.fd = FaceDetector()
             self.fd.fas_model_backbone = "mnv3"
             
             
         elif self.fas_model_backbone == "rn18":
-            self.fas = LivenessDetection("./model/rn18-fas.onnx")
+            self.fas = LivenessDetection()
             self.fd = FaceDetector()
             self.fd.fas_model_backbone = "rn18"
             

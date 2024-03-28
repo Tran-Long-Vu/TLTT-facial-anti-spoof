@@ -2,11 +2,11 @@ from libs import *
 import os
 from PIL import Image
 import numpy as np
-from config import *
+from configs.config import *
 
 class LivenessDetection():
-    def __init__(self,path_to_fas_model) -> None: 
-        self.path_to_fas_model = path_to_fas_model
+    def __init__(self) -> None: 
+        self.path_to_fas_model = PATH_TO_FAS_MODEL
         self.model_format = "onnx"
         self.model = self.load_model()
 
@@ -36,7 +36,9 @@ class LivenessDetection():
                 outputs = ort_sess.run(None, {'actual_input_1': face})
             elif self.path_to_fas_model == "./model/rn18-fas.onnx":
                 outputs, x = ort_sess.run(None, {'input.1': face})
-            return outputs
+                return outputs
+            else:
+                print("  model  directory  error in configs")
         else:
             print("   FAS   cannot read face")
             return []

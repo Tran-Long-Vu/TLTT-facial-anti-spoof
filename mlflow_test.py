@@ -1,8 +1,8 @@
-from data_script.config import *
+from configs.config import *
 from libs import *
 from engines.scrfd import SCRFD
 from data_script.image_dataset import ImageDataset
-from config import *
+from configs.config import *
 import sklearn.metrics as metrics
 import pandas as pd
 import onnx

@@ -1,4 +1,4 @@
-from data_script.config import *
+from configs.config import *
 from libs import *
 
 from data_script.video_dataset import VideoDataset
@@ -30,4 +30,10 @@ if __name__ == '__main__':
     print(str(label))
     print(str(type(image)))
     print(str(type(label)))
+
+    fd = FaceDetector()
+    fas = LivenessDetection()
+
+
+
 

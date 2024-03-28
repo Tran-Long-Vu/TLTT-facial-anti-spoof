@@ -2,7 +2,7 @@ from libs import *
 from engines.scrfd import SCRFD
 from data_script.image_dataset import ImageDataset
 from engines.liveness_detection import LivenessDetection
-from config import *
+from configs.config import *
 class FaceDetector():
     def __init__(self) -> None:
         # self.data = self.load_data()

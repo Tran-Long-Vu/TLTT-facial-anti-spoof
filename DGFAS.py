@@ -6,7 +6,7 @@ import numpy as np
 from torch.autograd import Variable
 import random
 import os
-from config import *
+from configs.config import *
 
 def l2_norm(input, axis=1):
     norm = torch.norm(input, 2, axis, True)
