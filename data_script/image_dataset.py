@@ -20,7 +20,7 @@ class ImageDataset(torch.utils.data.Dataset):
             self.all_image_paths = glob.glob(path_to_data + "*/**/*.jpg",recursive=True)
             self.all_face_paths = glob.glob(path_to_data + "*/**/*.txt",recursive=True)
         elif self.dataset_name == "HAND_CRAWL":
-            self.all_image_paths = glob.glob(path_to_data + "**/*.jpg")
+            self.all_image_paths = glob.glob(path_to_data + "*/*.jpg")
         if augment == 'train':
             self.transform = tf.Compose([
                             tf.ToTensor(),
@@ -76,9 +76,15 @@ class ImageDataset(torch.utils.data.Dataset):
             t_label = torch.tensor(label)
             return t_image, t_label
         
-        
-        elif self.augment == 'test':
+        elif self.augment == 'val':
             image_path = self.all_image_paths[index]
+            image = cv2.imread(image_path)
+            label = self.get_label(image_path)
+            t_image = self.transform(cropped_image)
+            t_label = torch.tensor(label)
+            return t_image, t_label
+        elif self.augment == 'test':
+            image_path = self.all_image_paths[index] # all image paths
             image = cv2.imread(image_path)
             label = self.get_label(image_path)
             return image, label

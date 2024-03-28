@@ -1,13 +1,18 @@
 from data_script.config import *
 from libs import *
-from engines.scrfd import * 
-from engines.face_detector import *
-from data_script.image_dataset import ImageDataset
-from engines.liveness_detection import LivenessDetection
+
 from data_script.video_dataset import VideoDataset
+from data_script.image_dataset import ImageDataset
+
+from engines.face_detector import FaceDetector
+from engines.liveness_detection import LivenessDetection
+
+from torch.utils.data import Dataset, DataLoader
+import onnxruntime as ort
+import torchvision.transforms as tfs
+
 import sklearn.metrics as metrics
 import pandas as pd
-from config import *
 class FasSolution():
     def __init__(self) -> None:
         
@@ -17,6 +22,8 @@ class FasSolution():
         self.path_to_save_frames = "./data/crawl_test/frames/"
         self.model_format = "onnx"
         self.dataset = self.load_dataset()
+        
+        
         self.video_dataset = self.load_video_dataset()
         self.provider = ""
         self.cuda = torch.cuda.is_available()
@@ -52,11 +59,12 @@ class FasSolution():
     
     # init image dataset format
     def load_dataset(self):
-        dataset = ImageDataset( TEST_DATASET,
-                                PATH_TO_TEST_DATASET,
-                                MODEL_BACKBONE,
-                                augment = 'test',
+        dataset = ImageDataset(TEST_DATASET,
+                    PATH_TO_TEST_DATASET,
+                    MODEL_BACKBONE,
+                    augment = 'test',
                                     )
+        # print(   '    len  ds     '  +   str(len(dataset)))
         return dataset
     
     # init video dataset format
@@ -391,11 +399,12 @@ class FasSolution():
     
 # Uncomment to test other attacks.
 if __name__ == '__main__':
+    
+    # error in imagre dataset code
+    
     fas_solution = FasSolution()
     fas_solution.run_on_image_dataset()
     # fas_solution.run_on_video_dataset()
-    #  todo - fas  run on video dataset (a,b,c,d,e) params.
-    #
     # Change source path to run single video.
     # fas_solution.run_on_video_file("./data/video_benchmark/0/real.mp4")
     
