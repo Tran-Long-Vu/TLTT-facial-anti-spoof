@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/913507081223400248/c2533403d17341b2b27cf43e0fd5a78a/artifacts
+deleted_time: 1711608016108
+end_time: 1711601620100
+entry_point_name: ''
+experiment_id: '913507081223400248'
+lifecycle_stage: deleted
+run_id: c2533403d17341b2b27cf43e0fd5a78a
+run_name: epoch 5, cvpr set on resnet18, printing
+run_uuid: c2533403d17341b2b27cf43e0fd5a78a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1711601619947
+status: 3
+tags: []
+user_id: PC

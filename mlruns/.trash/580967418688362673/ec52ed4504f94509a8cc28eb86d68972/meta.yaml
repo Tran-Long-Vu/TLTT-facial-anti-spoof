@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/580967418688362673/ec52ed4504f94509a8cc28eb86d68972/artifacts
+deleted_time: 1711591619516
+end_time: 1711591301683
+entry_point_name: ''
+experiment_id: '580967418688362673'
+lifecycle_stage: deleted
+run_id: ec52ed4504f94509a8cc28eb86d68972
+run_name: angry-gnu-576
+run_uuid: ec52ed4504f94509a8cc28eb86d68972
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1711591299461
+status: 3
+tags: []
+user_id: PC

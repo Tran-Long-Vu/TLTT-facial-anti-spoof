@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/580967418688362673/f368d53d735c464ea1f455aef2eb6874/artifacts
+deleted_time: 1711591619516
+end_time: 1711590804012
+entry_point_name: ''
+experiment_id: '580967418688362673'
+lifecycle_stage: deleted
+run_id: f368d53d735c464ea1f455aef2eb6874
+run_name: merciful-mule-484
+run_uuid: f368d53d735c464ea1f455aef2eb6874
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1711590803974
+status: 3
+tags: []
+user_id: PC

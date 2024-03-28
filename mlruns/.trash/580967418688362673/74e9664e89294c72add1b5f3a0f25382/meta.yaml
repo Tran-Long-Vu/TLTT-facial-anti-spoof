@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/580967418688362673/74e9664e89294c72add1b5f3a0f25382/artifacts
+deleted_time: 1711591619516
+end_time: 1711590779497
+entry_point_name: ''
+experiment_id: '580967418688362673'
+lifecycle_stage: deleted
+run_id: 74e9664e89294c72add1b5f3a0f25382
+run_name: adorable-tern-816
+run_uuid: 74e9664e89294c72add1b5f3a0f25382
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1711590779459
+status: 3
+tags: []
+user_id: PC

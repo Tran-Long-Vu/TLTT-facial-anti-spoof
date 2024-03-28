@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/580967418688362673/e31002bc22c5460fba0d42366fdfc2c5/artifacts
+deleted_time: 1711591619516
+end_time: 1711591392177
+entry_point_name: ''
+experiment_id: '580967418688362673'
+lifecycle_stage: deleted
+run_id: e31002bc22c5460fba0d42366fdfc2c5
+run_name: upbeat-shad-550
+run_uuid: e31002bc22c5460fba0d42366fdfc2c5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1711591392150
+status: 4
+tags: []
+user_id: PC

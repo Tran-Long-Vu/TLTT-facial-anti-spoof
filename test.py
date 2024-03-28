@@ -12,9 +12,7 @@ class FasSolution():
     def __init__(self) -> None:
         
         self.fas_model_backbone = "rn18" # change between 'rn18' and 'mnv3'
-        
-        self.path_to_data = './data/crawl_test/all_images/'
-        self.path_to_labeled_data = './data/crawl_test/images/'
+        self.path_to_labeled_data = PATH_TO_TEST_DATASET
         self.path_to_video_dir = './data/crawl_test/videos/'
         self.path_to_save_frames = "./data/crawl_test/frames/"
         self.model_format = "onnx"
@@ -396,6 +394,9 @@ if __name__ == '__main__':
     fas_solution = FasSolution()
     fas_solution.run_on_image_dataset()
     # fas_solution.run_on_video_dataset()
+    #  todo - fas  run on video dataset (a,b,c,d,e) params.
+    #
     # Change source path to run single video.
     # fas_solution.run_on_video_file("./data/video_benchmark/0/real.mp4")
+    
     pass
