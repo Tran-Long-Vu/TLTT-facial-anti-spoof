@@ -442,10 +442,13 @@ if __name__ == '__main__':
 
     train_loader = fas_trainer.load_image_dataloader(train_set)
     val_loader = fas_trainer.load_image_dataloader(val_set)
+    # if training attack
     fas_trainer.train_printing_attack(train_loader,
                                       fas_trainer.epochs,
                                       fas_trainer.model,
                                       fas_trainer.optimizer,
                                       fas_trainer.device,
                                       fas_trainer.save_ckp_dir)
+    # if replay attack:
+    # fas_trainer.run_replay_atk()
     pass

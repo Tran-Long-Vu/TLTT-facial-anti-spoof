@@ -1,3 +1,4 @@
 /data/
 /data/videos/fake_video_frames/
 /__pycache__/
+/model/

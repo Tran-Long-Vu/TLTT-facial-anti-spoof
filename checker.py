@@ -30,10 +30,9 @@ if __name__ == '__main__':
     print(str(label))
     print(str(type(image)))
     print(str(type(label)))
-
-    fd = FaceDetector()
-    fas = LivenessDetection()
-
-
-
-
+    device = torch.device('cuda')
+    # onnx runtime on fd onnx. 
+    providers=["CUDAExecutionProvider"] # onnxrt cannot read cuda driver
+    fd_session = ort.InferenceSession(PATH_TO_FD_MODEL,providers=providers)
+    fas_model = ort.InferenceSession(PATH_TO_FAS_MODEL,providers=providers)
+    print("   onnx cuda version:   "  +  (torch.version.cuda))
