@@ -9,3 +9,4 @@ pandas
 onnxruntime
 mlflow
 matplotlib
+mlflow

@@ -24,7 +24,7 @@ class FasTrainer():
         
     # init image dataset format
     def load_train_image_dataset(self):
-        training_dataset = ImageDataset(TRAIN_DATASET,
+        training_dataset =  ImageDataset(TRAIN_DATASET,
                                     PATH_TO_TRAIN_DATASET,
                                     MODEL_BACKBONE,
                                     augment = 'train',
@@ -121,6 +121,7 @@ class FasTrainer():
                 model.train()
                 running_loss, running_corrects,  = 0.0, 0.0, 
                 for images, labels in tqdm.tqdm(train_loader): 
+                
                     images, labels = images.to(device), labels.to(device)
                     
                     logits = model(images.float()) 
@@ -137,7 +138,8 @@ class FasTrainer():
                     optimizer.step(), optimizer.zero_grad()
 
                     running_loss, running_corrects,  = running_loss + loss.item()*images.size(0), running_corrects + torch.sum(torch.max(logits, 1)[1] == labels.data).item(), 
-                train_loss, train_accuracy,  = running_loss/len(train_loader.dataset), running_corrects/len(train_loader.dataset), 
+                
+                    train_loss, train_accuracy,  = running_loss/len(train_loader.dataset), running_corrects/len(train_loader.dataset), 
 
                 
                 train_FAR = train_FP / (train_FP + train_TN)
