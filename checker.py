@@ -44,7 +44,5 @@ if __name__ == '__main__':
             print(face_path)
             print("\n")
 
-
-
     fd = FaceDetector()
     fas = LivenessDetection()

@@ -19,8 +19,17 @@ class ImageDataset(torch.utils.data.Dataset):
         if self.dataset_name == "CVPR23":
             img_extension = '.jpg'
             text_extension = '.txt'
-            self.all_image_paths = glob.glob(path_to_data + f"*/**/*{img_extension}",recursive=True)
-            self.all_face_paths = glob.glob(path_to_data + f"*/**/*{text_extension}",recursive=True)
+            self.all_image_paths = []
+            self.all_face_paths = []
+            for root, dirs, files in os.walk(path_to_data):
+                for file in files:
+                    if file.endswith(img_extension):
+                        image_name = os.path.splitext(file)[0]
+                        txt_file = image_name + text_extension
+                        txt_path = os.path.join(root, txt_file)
+                        if os.path.exists(txt_path):
+                            self.all_image_paths.append(os.path.join(root, file))
+                            self.all_face_paths.append(txt_path)
         elif self.dataset_name == "HAND_CRAWL":
             self.all_image_paths = glob.glob(path_to_data + "*/*.jpg")
         if augment == 'train':
@@ -68,49 +77,18 @@ class ImageDataset(torch.utils.data.Dataset):
             
             image = cv2.imread(image_path)
             label = self.get_label(image_path)
+            # cut image
+            with open(face_path, 'r') as file:
+                bbox = [next(file).strip() for _ in range(2)]
+            x1, y1 = map(int, bbox[0].split())
+            x2, y2 = map(int, bbox[1].split())    
 
-            image_path_without_extension = os.path.splitext(image_path)[0]
-            face_path_without_extension = os.path.splitext(face_path)[0]
-            # if image_path_without_extension != face_path_without_extension
-            #   find face_path_without_extension == image_path_without_extension
-            # else:
-            #   skip image
-            if image_path_without_extension != face_path_without_extension:
-                # Find a matching face_path_without_extension that corresponds to the current image_path_without_extension
-                matching_face_path = None
-                for index in range(len(self.all_face_paths)):
-                    current_face_path = self.all_face_paths[index]
-                    current_face_path_without_extension = os.path.splitext(current_face_path)[0]
-                    if current_face_path_without_extension == image_path_without_extension:
-                        matching_face_path = current_face_path
-                        break
-            
-                if matching_face_path is not None:
-                    print(  "    I   "  +  image_path_without_extension)
-                    print(  '    F   '    +  str(matching_face_path) + "\n")
-                    with open(face_path, 'r') as file:
-                        bbox = [next(file).strip() for _ in range(2)]
-                    # print("First two lines:", lines_array)
-                    # cut the image by the bbox
-                    x1, y1 = map(int, bbox[0].split())
-                    x2, y2 = map(int, bbox[1].split())      
-                    
-                    image = cv2.imread(image_path)
-                    cropped_image = image[y1:y2, x1:x2] # after cut.
-
-
-
-                    # if (cropped_image==0).any():
-                    #     pass
-                    label = self.get_label(image_path)
-                    label = torch.tensor(label)
-                    t_image = self.transform(cropped_image)
-                    # cv2.imwrite(f'test_image/{index}.jpg' ,cropped_image)
-                    # t_label = torch.tensor((label))
-                    return t_image, label
-                else:
-                    pass
-        
+            image = cv2.imread(image_path)
+            cropped_image = image[y1:y2, x1:x2] 
+            label = self.get_label(image_path)
+            t_label = torch.tensor(label)
+            t_image = self.transform(cropped_image)
+            return t_image, t_label        
         elif self.augment == 'val':
             image_path = self.all_image_paths[index]
             face_path = self.all_face_paths[index]
@@ -120,9 +98,6 @@ class ImageDataset(torch.utils.data.Dataset):
 
             image_path_without_extension = os.path.splitext(image_path)[0]
             face_path_without_extension = os.path.splitext(face_path)[0]
-
-            # print(  "    I   "  +  image_path_without_extension)
-            # print(  '    F   '    +  face_path_without_extension)
             
             t_image = self.transform(image)
             t_label = torch.tensor(label)
