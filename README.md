@@ -1,4 +1,4 @@
-# Project: VHT-facial-anti-spoof
+# Project: facial-anti-spoof
 # Training Facial Anti Spoof model on CVPR23 dataset.
 
 ## Congifuration Environment
